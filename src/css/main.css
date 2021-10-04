@@ -1,3 +1,20 @@
-body {
-    text-align: center;
+@import url("./game-box.css");
+@import url("./controls.css");
+
+table {
+    border-collapse: separate;
+    border-spacing: 0em 0px;
+    color: white
 }
+.grid {
+    display: grid;
+    grid-template-columns: auto auto auto; 
+    grid-gap: 10px;
+    color: white;
+  }
+  .hr {
+      width: 300%;
+      border-style: solid;
+      margin-left: auto;
+      margin-right: auto;
+  }

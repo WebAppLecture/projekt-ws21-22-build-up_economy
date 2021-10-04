@@ -1,15 +1,13 @@
-fetch("src/data/data.json")
-    .then(e => e.json())
-    .then(json => {
-        let title = document.createElement("h2"),
-            content = document.createElement("p"),
-            image = document.createElement("img");
+import { Skin } from "./Skin.js";
 
-        title.innerHTML = json.title;
-        content.innerHTML = json.content;
-        image.setAttribute("src", "./src/images/sql magic.jpg");
+let skinStyle = document.querySelector("#skin"),
+    skins = ["assignan"];
 
-        document.body.appendChild(title);
-        document.body.appendChild(content);
-        document.body.appendChild(image);
-    });
+
+window.skin = new Skin(skinStyle, skins, "./src/css/");
+
+//document.querySelector(".next").addEventListener("click", () => skinChanger.next());
+//document.querySelector(".previous").addEventListener("click", () => skinChanger.previous());
+
+skin.activeSkin = "assignan";
+

@@ -1,0 +1,51 @@
+.control,
+.skin-change > div {
+    cursor: pointer;
+}
+
+.d-pad {
+    grid-area: dpad;
+    width: 7vh;
+    height: 9.5vh;
+}
+
+.up {
+    transform: rotate(10deg) translateY(-7vh);
+}
+
+.right {
+    transform: rotate(100deg) translateY(-7vh);
+}
+
+.down {
+    transform: rotate(190deg) translateY(-7vh);
+}
+
+.left {
+    transform: rotate(280deg) translateY(-7vh);
+}
+
+.big-button {   
+    width: 7vh;
+    height: 7vh;
+    
+    border-radius: 50%;
+}
+
+.reset {
+    grid-area: menu;
+
+    width: 7.5vh;
+    height: 4vh;
+}
+
+.A {
+    grid-area: A;
+    transform: translateY(-5vh); 
+}
+
+
+.B {
+    grid-area: B;
+    transform: translateX(2vh);
+}

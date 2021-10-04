@@ -1,0 +1,121 @@
+:root {
+    --green: #d6d2c1;
+}
+
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    user-select: none;
+    margin: .5vh;
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+    min-height: -moz-available;
+}
+
+.centered {
+    margin: 0 auto;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.gameBox {
+    position: relative;
+    min-height: 99vh;
+    min-height: -webkit-fill-available;
+    max-height: 99vh;
+    width: 120vh;
+    aspect-ratio: 1 / 3;
+    padding: 0 2vh 2vh 2vh;
+    display: grid;
+    grid-template-columns: max-content repeat(3, 1fr) max-content;
+    grid-template-rows: max-content max-content 27vh minmax(0,auto);
+    grid-template-areas: 
+        "logo logo logo logo menu"
+        "screen screen screen screen screen"
+        "dpad dpad dpad B A"
+        "skin-changer skin-changer accent accent accent";
+    align-items: center;
+    justify-items: center;
+}
+
+.logo {
+    grid-area: logo;
+    align-self: stretch;
+    justify-self: stretch;
+    font-size: 6vh;
+}
+
+.accent {
+   grid-area: accent;
+   align-self: end;
+   justify-self: end;
+}
+
+.screen {
+    grid-area: screen;
+    align-self: start;
+    width: 100%;
+    aspect-ratio: 2/ 1;
+
+    padding: 1vh;
+
+    background-color: rgb(142, 162, 192);
+    color: rgb(134, 143, 156);
+    box-shadow: 0 0 1vh .2vh black inset;
+}
+
+.menu {
+    grid-area: screen;
+    align-self: start;
+    display: flex;
+    flex-direction: column;
+    width: 100vh;
+    height: max-content;
+    max-height: 50vh;
+    margin: 2vh auto;
+
+    overflow-y: auto;
+    z-index: 1;
+
+    border: .4vh solid var(--green);
+    box-shadow: 0 0 1vh 0 var(--green),
+        0 0 1vh 0 var(--green) inset;
+}
+
+.menu span {
+    margin: 1vh 3vh; 
+
+    font-family: monospace;
+    text-transform: uppercase;
+    text-align: center;
+    font-size: 2vh;
+    font-weight: 900;
+    color: var(--green);
+    text-shadow: 0 0 1vh var(--green);
+
+    border: .4vh solid transparent;
+}
+
+.menu span.active {
+    border: .4vh solid var(--green);
+    box-shadow: 0 0 1vh 0 var(--green),
+        0 0 1vh 0 var(--green) inset;
+}
+
+
+.skin-change {
+    grid-area: skin-changer;
+    justify-self: start;
+    align-self: end;
+}
+
+.skin-change > div {
+    display: inline-block;
+    width: 3vh;
+    height: 3vh;
+}

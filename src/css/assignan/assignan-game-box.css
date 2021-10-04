@@ -1,0 +1,113 @@
+body {
+    background: radial-gradient(ellipse at center, var(--gold-glow) 50%,var(--shadow) 100%);
+}
+
+.gameBox {
+    border-top: 3vh solid var(--gold);
+    border-right: 3vh solid var(--darkest-gold);
+    border-bottom: 3vh solid var(--gold);
+    border-left: 3vh solid var(--bright-gold);
+
+    border-radius: .3vh;
+
+    background: linear-gradient(to left, var(--bright-gold) -7%, var(--gold) 15%, var(--gold) 35%,var(--bright-gold) 60%,var(--gold) 75%, var(--dark-gold) 95%); 
+
+    box-shadow: 0 0 15vh -5vh yellow;
+}
+
+.logo{
+    background-color: var(--dark-gold);
+    background: linear-gradient(to top, var(--dark-gold), var(--shadow));
+
+    color: transparent;
+    font-family: monospace;
+
+    font-weight: bold;
+    text-shadow: .15vh .15vh .3vh #aaa;
+    -webkit-background-clip: text;
+       -moz-background-clip: text;
+            background-clip: text;
+}
+
+
+.logo:hover {
+    animation: menace 2s cubic-bezier(0.4, 0, 1, 1) infinite;
+}
+
+@keyframes menace {
+    0% {
+        background: linear-gradient(to right, hsl(55, 100%, 50%) 0%, var(--shadow) 20%);
+        -webkit-background-clip: text;
+        -moz-background-clip: text;
+        background-clip: text;
+    }
+    25% {
+        background: linear-gradient(to right, hsl(55, 100%, 50%) 20%, var(--shadow) 40%);
+        -webkit-background-clip: text;
+        -moz-background-clip: text;
+        background-clip: text;
+    }
+    50% {
+        background: linear-gradient(to right, hsl(55, 100%, 50%) 40%, var(--shadow) 60%);
+        -webkit-background-clip: text;
+        -moz-background-clip: text;
+        background-clip: text;
+    }
+    75% {
+        background: linear-gradient(to right, hsl(55, 100%, 50%) 60%, var(--shadow) 80%);
+        -webkit-background-clip: text;
+        -moz-background-clip: text;
+        background-clip: text;
+    }
+    100% {
+        background: linear-gradient(to right, hsl(55, 100%, 50%) 80%, var(--shadow) 100%);
+        -webkit-background-clip: text;
+        -moz-background-clip: text;
+        background-clip: text;
+    }
+}
+
+.screen {
+    border-top: 1vh solid var(--gold);
+    border-right: 1vh solid var(--bright-gold);
+    border-bottom: 1vh solid var(--gold);
+    border-left: 1vh solid var(--dark-gold);
+
+    background-color: rgb(3, 19, 3);
+    color: rgb(190, 16, 16);
+    box-shadow: 0 0 1vh .2vh black inset;
+
+    transition: background-color .5s;
+}
+
+.screen.on {
+    background-color: rgb(0, 0, 0);
+    transition: background-color .5s;
+}
+
+
+.menu {
+    border: .4vh dashed var(--green);
+    box-shadow: 0 0 1vh 0 var(--green),
+        0 0 1vh 0 var(--green) inset;
+}
+
+.menu > ul {
+    padding-inline-start: 0;
+
+    font-family: monospace;
+    text-transform: uppercase;
+    text-align: center;
+    font-size: 2vh;
+    font-weight: 900;
+    color: var(--green);
+    text-shadow: 0 0 1vh var(--green);
+
+    border: .4vh solid transparent;
+}
+
+.menu > ul.active {
+    border: .4vh solid var(--green);
+    box-shadow: 0 0 1vh 0 var(--green),
+        0 0 1vh 0 var(--green) inset;
+}
