@@ -22,14 +22,65 @@ export class Database {
             this.db.buildings.put({name: this.infstr[j],cost:this.infstr_cost[j], number: this.infstr_num[j]})
         }
         
+        this.createStatTot();
+        this.createBuildings();
+    };
+
+    createStatTot() {
         let container = document.getElementById("stat-tot");
-        let cell1 = document.createElement("div"), cell2 = document.createElement("div"), cell3 = document.createElement("div");
+        let cell1 = document.createElement("div"), 
+                cell2 = document.createElement("div"), 
+                cell3 = document.createElement("div"),
+                cell4 = document.createElement("div");
         cell1.className = "cell" 
         cell1.innerHTML = "Goods"
         cell2.className = "cell" 
         cell2.innerHTML = "Total Number"
         cell3.className = "cell" 
         cell3.innerHTML = "Value per Unit in GP"
+        cell4.className = "cell" 
+        cell4.innerHTML = "Total value of this asset"
+
+        container.appendChild(cell1)
+        container.appendChild(cell2)
+        container.appendChild(cell3)
+        container.appendChild(cell4)
+        container.appendChild(document.createElement("hr"))
+        container.appendChild(document.createElement("hr"))
+        container.appendChild(document.createElement("hr"))
+        container.appendChild(document.createElement("hr"))
+
+        for (let i=0;i<this.assets.length;i++) {
+            let cell1 = document.createElement("div"), 
+                cell2 = document.createElement("div"), 
+                cell3 = document.createElement("div"),
+                cell4 = document.createElement("div");
+            cell1.className = "cell" 
+            cell1.innerHTML = this.assets[i]
+            cell2.className = "cell" 
+            cell2.innerHTML = this.asset_num[i]
+            cell3.className = "cell" 
+            cell3.innerHTML = this.asset_VPU[i]
+            cell4.className = "cell" 
+            cell4.innerHTML = this.asset_num[i]*this.asset_VPU[i]
+
+            container.appendChild(cell1)
+            container.appendChild(cell2)
+            container.appendChild(cell3)
+            container.appendChild(cell4)
+
+            }
+    };
+
+    createBuildings() {
+        let container = document.getElementById("build");
+        let cell1 = document.createElement("div"), cell2 = document.createElement("div"), cell3 = document.createElement("div");
+        cell1.className = "cell" 
+        cell1.innerHTML = "Building"
+        cell2.className = "cell" 
+        cell2.innerHTML = "Cost of one building"
+        cell3.className = "cell" 
+        cell3.innerHTML = "Total number of buildings"
 
         container.appendChild(cell1)
         container.appendChild(cell2)
@@ -38,23 +89,26 @@ export class Database {
         container.appendChild(document.createElement("hr"))
         container.appendChild(document.createElement("hr"))
 
-        for (let i=0;i<this.assets.length;i++) {
+        for (let i=0;i<this.infstr.length;i++) {
             let cell1 = document.createElement("div"), cell2 = document.createElement("div"), cell3 = document.createElement("div");
             cell1.className = "cell" 
-            cell1.innerHTML = this.assets[i]
+            cell1.innerHTML = this.infstr[i]
             cell2.className = "cell" 
-            cell2.innerHTML = this.asset_num[i]
+            let txt ="";
+            for (let x in this.infstr_cost[i]) {
+                txt += x+":"+this.infstr_cost[i][x] +" ";
+            };
+            cell2.innerHTML = txt
             cell3.className = "cell" 
-            cell3.innerHTML = this.asset_VPU[i]
+            cell3.innerHTML = this.infstr_num[i]
 
             container.appendChild(cell1)
             container.appendChild(cell2)
             container.appendChild(cell3)
 
             }
-
-    
     };
+
 
     async putGood (Name,newInc,newTot){
         await this.db.goods.put({name: Name, income: newInc, total: newTot});

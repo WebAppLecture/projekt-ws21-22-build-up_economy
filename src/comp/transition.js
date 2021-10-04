@@ -1,14 +1,14 @@
 import { Database } from "./database.js";
 
 let btns = Array.from(document.querySelectorAll(".controls > button")),
-    tbls = Array.from(document.querySelectorAll(".menu > table"));
+    tbls = Array.from(document.querySelectorAll(".menu > .grid"));
 
 
 btns.forEach(btn => btn.addEventListener("click", ()=> show(btn,tbls)));
 
 function show(elem,list) {
     list.forEach(e => e.classList.add("hidden"));
-    document.querySelector("table#"+elem.dataset.table).classList.remove("hidden")
+    document.querySelector("#"+elem.dataset.table).classList.remove("hidden")
 }
 
 async function Sleep(milliseconds) {
