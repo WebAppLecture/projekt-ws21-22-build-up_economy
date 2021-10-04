@@ -5,7 +5,7 @@ WiSe 2021/2022
 
 Leitung: Dr. Friedrich Wünsch, Louis Ritzkowski
 
-# Assignan - Economics-simulation for a high-fantasy village #
+# Assignan - Economy-simulation for a high-fantasy village #
 ![Wappen_Assignan](https://user-images.githubusercontent.com/78024843/135888069-ba547cb3-434b-4fe1-b509-3309e808759e.PNG)
 
 Maximilian Graml
