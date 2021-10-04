@@ -96,7 +96,7 @@ export class Database {
             cell2.className = "cell" 
             let txt ="";
             for (let x in this.infstr_cost[i]) {
-                txt += x+":"+this.infstr_cost[i][x] +" ";
+                txt += x+": "+this.infstr_cost[i][x] +" ";
             };
             cell2.innerHTML = txt
             cell3.className = "cell" 
