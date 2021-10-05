@@ -23,11 +23,12 @@ export class Database {
         }
         
         this.createStatTot();
-        this.createBuildings();
+        this.createStatBuild();
     };
 
-    createStatTot() {
+    async createStatTot() {
         let container = document.getElementById("stat-tot");
+        container.innerHTML="";
         let cell1 = document.createElement("div"), 
                 cell2 = document.createElement("div"), 
                 cell3 = document.createElement("div"),
@@ -45,24 +46,24 @@ export class Database {
         container.appendChild(cell2)
         container.appendChild(cell3)
         container.appendChild(cell4)
-        container.appendChild(document.createElement("hr"))
-        container.appendChild(document.createElement("hr"))
-        container.appendChild(document.createElement("hr"))
-        container.appendChild(document.createElement("hr"))
+        for (let i=1;i<=4;i++){
+            container.appendChild(document.createElement("hr"))
+        };
 
         for (let i=0;i<this.assets.length;i++) {
             let cell1 = document.createElement("div"), 
                 cell2 = document.createElement("div"), 
                 cell3 = document.createElement("div"),
                 cell4 = document.createElement("div");
+            let aux = await this.db.goods.get(this.assets[i])
             cell1.className = "cell" 
-            cell1.innerHTML = this.assets[i]
+            cell1.innerHTML = aux.name
             cell2.className = "cell" 
-            cell2.innerHTML = this.asset_num[i]
+            cell2.innerHTML = aux.total
             cell3.className = "cell" 
-            cell3.innerHTML = this.asset_VPU[i]
+            cell3.innerHTML = aux.valPU
             cell4.className = "cell" 
-            cell4.innerHTML = this.asset_num[i]*this.asset_VPU[i]
+            cell4.innerHTML = aux.total*aux.valPU
 
             container.appendChild(cell1)
             container.appendChild(cell2)
@@ -72,39 +73,57 @@ export class Database {
             }
     };
 
-    createBuildings() {
+    async createStatBuild() {
         let container = document.getElementById("build");
-        let cell1 = document.createElement("div"), cell2 = document.createElement("div"), cell3 = document.createElement("div");
+        container.innerHTML="";
+        let cell1 = document.createElement("div"), 
+            cell2 = document.createElement("div"), 
+            cell3 = document.createElement("div"),
+            cell4 = document.createElement("div");
         cell1.className = "cell" 
         cell1.innerHTML = "Building"
         cell2.className = "cell" 
         cell2.innerHTML = "Cost of one building"
         cell3.className = "cell" 
         cell3.innerHTML = "Total number of buildings"
+        cell4.className = "cell"
+        cell4.innerHTML = "Build"
 
         container.appendChild(cell1)
         container.appendChild(cell2)
         container.appendChild(cell3)
-        container.appendChild(document.createElement("hr"))
-        container.appendChild(document.createElement("hr"))
-        container.appendChild(document.createElement("hr"))
+        container.appendChild(cell4)
+        for (let i=1;i<=4;i++){
+            container.appendChild(document.createElement("hr"))
+        };
 
         for (let i=0;i<this.infstr.length;i++) {
-            let cell1 = document.createElement("div"), cell2 = document.createElement("div"), cell3 = document.createElement("div");
+            let cell1 = document.createElement("div"), 
+                cell2 = document.createElement("div"), 
+                cell3 = document.createElement("div"),
+                btn = document.createElement("button");
+            let aux = await this.db.buildings.get(this.infstr[i])
             cell1.className = "cell" 
-            cell1.innerHTML = this.infstr[i]
+            cell1.innerHTML = aux.name
             cell2.className = "cell" 
             let txt ="";
-            for (let x in this.infstr_cost[i]) {
-                txt += x+": "+this.infstr_cost[i][x] +" ";
+            for (let x in aux.cost) {
+                txt += x+": "+aux.cost[x] +" ";
             };
             cell2.innerHTML = txt
             cell3.className = "cell" 
-            cell3.innerHTML = this.infstr_num[i]
+            cell3.innerHTML = aux.number
+
+            btn.innerHTML   = "Build"
+            btn.id          = "btn-build-"+aux.name
+            btn.className   = "build"
+            btn.addEventListener("click", ()=>this.buildBuilding(aux.name,1))
+            
 
             container.appendChild(cell1)
             container.appendChild(cell2)
             container.appendChild(cell3)
+            container.appendChild(btn)
 
             }
     };
@@ -112,6 +131,7 @@ export class Database {
 
     async putGood (Name,newInc,newTot){
         await this.db.goods.put({name: Name, income: newInc, total: newTot});
+        this.createStatTot();
     };
 
     async addGood (Name,addInc,addTot){
@@ -121,7 +141,7 @@ export class Database {
             aux.income= addInc;
             await this.db.goods.put(aux);
         })
-        
+        this.createStatTot();
     };
     async getAllGoods () {
         let aux = await this.db.goods.bulkGet(this.assets);
@@ -148,15 +168,20 @@ export class Database {
                 let aux = await this.db.goods.get(key);
                 if (-bui.cost[key]+aux.total < 0) {
                     console.log(key,bui.cost[key]-aux.total)
-                    throw new Error('Not enough goods!');
-                }
-                else {
-                    console.log("Enough",key,bui.cost[key],aux.total);
-                    aux.total -= bui.cost[key];
-                    await this.db.goods.put(aux)
                 }
             });
         }).then( ()=>{
+            this.db.transaction("rw",this.db.goods,this.db.buildings, async()=>{
+                let bui = await this.db.buildings.get(Name);
+                console.log("Topl",bui.cost);
+                Object.keys(bui.cost).forEach(async key => {
+                    console.log(key);
+                    let aux = await this.db.goods.get(key);
+                    console.log("Enough",key,bui.cost[key],aux.total);
+                    aux.total -= bui.cost[key];
+                    await this.db.goods.put(aux)
+                });
+            });
             this.db.transaction("rw",this.db.buildings,async()=>{
                 let bui = await this.db.buildings.get(Name);
                 console.log("bui number:",bui.number,"Number:",Number)
@@ -167,6 +192,8 @@ export class Database {
 
             console.error(err.stack)
         })
+        this.createStatBuild();
+        this.createStatTot();
     };
 
 
