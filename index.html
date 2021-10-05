@@ -1,8 +1,89 @@
 <html>
     <head>
-        <link rel="stylesheet" href="src/css/main.css">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+        <link rel="stylesheet" href="./src/css/main.css"/>
+        <link rel="stylesheet" id="skin"/>
+        <script src="https://unpkg.com/dexie@latest/dist/dexie.js"></script>
+        <script defer type="module" src="src/js/index.js"></script>
+        <script defer type="module" src="src/comp/transition.js"></script>
     </head>
     <body>
+        <div class="centered gameBox">
+            <div class="logo">Assignan - Economic Aspects</div>
+            <canvas class="screen on" width="400" height="600">Test</canvas>
+            <nav class="menu">
+                <div class="controls">
+                    <button id="btn-stat-tot" data-table="stat-tot">Statistics total</button>
+                    <button id="btn-stat-inc" data-table="stat-inc">Statistics income</button>
+                    <button id="btn-build" data-table="build">Buildings</button>
+                </div>
+                    <div class="grid" id="stat-tot"></div>
+                    <!--<table id="stat-tot" style="width: 100%;" border="1" cellpadding="10">
+                        </table>-->
+                    <div class="grid hidden" id="stat-inc">
+                        <div>Test</div>
+                    </div>
+                        
+                    <div class="grid hidden" id="build">
+                        
+                    </div>
+                    <!--
+                    <table id="build" class="hidden" style="width: 100%;" border="1" cellpadding="10">
+                        <tbody>
+                            <tr>
+                                <td>Costs</td>
+                                <td>Wood</td>
+                                <td>Stone</td>
+                                <td>Marble</td>
+                                <td>Glass</td>
+                                <td>Steel</td>
+                                <td>Goldpieces</td>
+                                <td>total in Goldpieces</td>
+                                <td>Yield per week</td>
+                                <td>Constant Yield</td>
+                            </tr>
+                            <tr>
+                            <td>Lumber&nbsp;</td>
+                            <td>20&nbsp;</td>
+                            </tr>
+                            <tr>
+                            <td>Stone&nbsp;</td>
+                            <td>10&nbsp;</td>
+                            </tr>
+                            <tr>
+                            <td>Fish&nbsp;</td>
+                            <td>5&nbsp;</td>
+                            </tr>
+                            <tr>
+                            <td>Population&nbsp;</td>
+                            <td>100&nbsp;</td>
+                            </tr>
+                        </tbody>
+                        </table>
+                    -->
+            </nav>
+            <!--
+                    <li class="active">Item1</li>
+                    <li>Item2longlonglonglonglong</li>
+                    <li>Item3</li>
+                    <li>Item4</li>
+                    <li>Item5</li>
+                    <li>Test</li>
+                    -->
+            <!--<div id="up" class="control d-pad up">^</div>
+            <div id="right" class="control d-pad right">^</div>
+            <div id="down" class="control d-pad down">^</div>
+            <div id="left" class="control d-pad left">^</div>
+        -->
+            <div id="reset" class="control reset" >menu</div>
+            <div id="primary" class="control big-button A">E</div>
+            <div id="secondary" class="control big-button B">Q</div>
+            <nav class="skin-change">
+                <div class="previous"><</div>
+                <div class="next">></div>
+            </nav>
+        
+            <div class="accent"></div>
+        </div>
     </body>
-    <script type="module" src="src/js/index.js"></script>
 </html>

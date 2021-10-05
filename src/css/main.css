@@ -12,9 +12,6 @@ table {
     grid-gap: 10px;
     color: white;
   }
-#build {
-    grid-template-columns: auto auto auto;
-}
   .hr {
       width: 300%;
       border-style: solid;
