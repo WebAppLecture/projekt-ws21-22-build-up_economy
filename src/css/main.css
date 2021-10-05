@@ -8,13 +8,16 @@ table {
 }
 .grid {
     display: grid;
-    grid-template-columns: auto auto auto auto; 
+    grid-template-columns: auto auto auto auto auto; 
     grid-gap: 10px;
     color: white;
   }
-  .hr {
-      width: 300%;
-      border-style: solid;
-      margin-left: auto;
-      margin-right: auto;
-  }
+#stat-goods {
+    grid-template-columns: auto auto auto auto auto;
+}
+.hr {
+    width: 300%;
+    border-style: solid;
+    margin-left: auto;
+    margin-right: auto;
+}
