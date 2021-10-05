@@ -159,35 +159,21 @@ export class Database {
     }
 
 
-    async buildBuilding (Name,Number){
+    async buildBuilding (name, number){
         this.db.transaction("rw",this.db.goods,this.db.buildings, async()=>{
-            let bui = await this.db.buildings.get(Name);
-            console.log("Topl",bui.cost);
-            Object.keys(bui.cost).forEach(async key => {
-                console.log(key);
-                let aux = await this.db.goods.get(key);
-                if (-bui.cost[key]+aux.total < 0) {
-                    console.log(key,bui.cost[key]-aux.total)
-                }
-            });
-        }).then( ()=>{
-            this.db.transaction("rw",this.db.goods,this.db.buildings, async()=>{
-                let bui = await this.db.buildings.get(Name);
-                console.log("Topl",bui.cost);
-                Object.keys(bui.cost).forEach(async key => {
-                    console.log(key);
-                    let aux = await this.db.goods.get(key);
-                    console.log("Enough",key,bui.cost[key],aux.total);
-                    aux.total -= bui.cost[key];
-                    await this.db.goods.put(aux)
-                });
-            });
-            this.db.transaction("rw",this.db.buildings,async()=>{
-                let bui = await this.db.buildings.get(Name);
-                console.log("bui number:",bui.number,"Number:",Number)
-                bui.number += Number;
-                await this.db.buildings.put(bui)
-            })
+            const building = await this.db.buildings.get(name),
+                requiredGoods = Object.keys(building.cost),
+                goods = {};
+            (await this.db.goods.bulkGet(requiredGoods)).forEach((resource, i) => goods[requiredGoods[i]] = resource)
+            const buildable = requiredGoods.every(resourceName => goods[resourceName].total >= building.cost[resourceName])
+            if(!buildable) {
+                return
+            }
+            requiredGoods.forEach(resourceName => goods[resourceName].total -= building.cost[resourceName])
+            await this.db.goods.bulkPut(Object.values(goods))
+            building.number += number
+            await this.db.buildings.put(building)
+            console.log("built " + number +" more of this", building)
         }).catch(err => {
 
             console.error(err.stack)
