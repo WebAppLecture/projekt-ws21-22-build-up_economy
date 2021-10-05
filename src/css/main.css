@@ -15,6 +15,9 @@ table {
 #stat-goods {
     grid-template-columns: auto auto auto auto auto;
 }
+#stat-tot {
+    grid-template-columns: auto auto;
+}
 .hr {
     width: 300%;
     border-style: solid;

@@ -3,16 +3,18 @@ export class Database {
           this.db = new Dexie("assignan_database");
           this.db.version(1).stores({
               goods: 'name,income,total,valPU',
-              buildings: 'name,cost,number,yield_weekly,yield_const'
+              buildings: 'name,cost,number,yield_weekly,yield_const',
+              time: 'name,year,week',
+              population: 'name,total,adult,infant,housings',
+              capacity: 'name,resources,food',
+              diplomacy: 'name,fame,arcane',
+              value: 'name,total,resources,buildings'
           });
         this.assets = ["Wood","Stone","Silver","Marble","Glass","Gold","Grapes","Pottery","Furniture","Bread","Wheat","Beef","Fish","spiritual food","GP"];
         this.asset_num = [5475,2500,12,220,625,5,40,60,0,1250,0,700,300,0,20658];
         this.asset_VPU = [1.5,3,50,10,4,100,2.5,2,6.5,0.1,0.1,0.3,0.2,0,1];
-        this.population_adult = 144
-        this.population_infant= 23
-        this.housing = 0
-        this.fame = 0
-        this.total_value = 0
+        
+        
         for (let i=0;i<this.assets.length;i++) {
             this.db.goods.put({name:this.assets[i],income:0,total:this.asset_num[i],valPU:this.asset_VPU[i]});
         }
@@ -29,20 +31,68 @@ export class Database {
                                     number: this.infstr_num[j],yield_weekly:this.yield_weekly[j],yield_const:this.yield_const[j]})
         }
         this.update();
+        this.firstUpdate();
     };
 
     async sleep(milliseconds) {
         return new Promise(resolve => setTimeout(resolve, milliseconds));
     };
 
+    async firstUpdate() {
+        await this.db.time.put({name:"Time",year: 1132, week:30});
+        await this.db.population.put({name:"Population",total:167,adult:144,infant:23,housings:0});
+        await this.db.capacity.put({name:"Capacity",resources:15000,food:30000});
+        
+        await this.db.diplomacy.put({name:"Diplomacy",fame: 2,arcane:1});
+        await this.db.value.put({name:"Value",total: 0,resources:0,buildings:0});
+    }
+
     async update(){
+        
         await this.createStatBuild();
         await this.computeYield();
+        await this.createStatGoods();
         await this.createStatTot();
     };
 
-
     async createStatTot() {
+        let container = document.getElementById("stat-tot");
+        container.innerHTML="";
+        let cell1 = document.createElement("div"), 
+                cell2 = document.createElement("div"), 
+                cell3 = document.createElement("div"),
+                cell4 = document.createElement("div"),
+                head = document.createElement("h1");
+        head.innerHTML = "Assignan"
+        let img = document.createElement("img");
+        img.src = "./src/images/Wappen_Assignan.png"
+        img.style.height = '96px'; img.style.width = '96px';
+        img.align="right"
+        cell1.appendChild(img)
+        container.appendChild(head)
+        container.appendChild(cell1)
+        
+        let time = document.createElement("div"), 
+                pop = document.createElement("div"), 
+                cap = document.createElement("div"),
+                dipl = document.createElement("div"),
+                val = document.createElement("div");
+
+        let pop_aux  = await this.db.population.get("Population"),
+            time_aux = await this.db.time.get("Time"),
+            cap_aux  = await this.db.capacity.get("Capacity"),
+            dipl_aux = await this.db.diplomacy.get("Diplomacy"),
+            val_aux  = await this.db.value.get("Value");
+        console.log(pop_aux,time_aux,cap_aux,dipl_aux,val_aux)
+        let pop_txt =""; for (let x in pop_aux) {pop_txt += x+": "+pop_aux[x] +" "}; pop.innerHTML = pop_txt; container.appendChild(pop);
+        let time_txt =""; for (let x in time_aux) {time_txt += x+": "+time_aux[x] +" "}; time.innerHTML = time_txt; container.appendChild(time);
+        let cap_txt =""; for (let x in cap_aux) {cap_txt += x+": "+cap_aux[x] +" "}; cap.innerHTML = cap_txt; container.appendChild(cap);
+        let dipl_txt =""; for (let x in dipl_aux) {dipl_txt += x+": "+dipl_aux[x] +" "}; dipl.innerHTML = dipl_txt; container.appendChild(dipl);
+        let val_txt =""; for (let x in val_aux) {val_txt += x+": "+val_aux[x] +" "}; val.innerHTML = val_txt; container.appendChild(val);
+
+        };
+
+    async createStatGoods() {
         let container = document.getElementById("stat-goods");
         container.innerHTML="";
         let cell1 = document.createElement("div"), 
@@ -191,12 +241,12 @@ export class Database {
             (await this.db.goods.bulkGet(this.assets)).forEach((res,k)=> {goods[this.assets[k]] = res});
             
             let goods_aux = {...goods};
-            console.log("Before:",goods_aux);
+            //console.log("Before:",goods_aux);
             Object.keys(goods_aux).forEach(resource => goods_aux[resource].income = 0);
             Object.keys(incomes).forEach(building => {Object.keys(incomes[building]).forEach((resource,i) => { goods_aux[resource].income += Object.values(incomes[building])[i]*number[building];})});
-            console.log(goods,goods_aux)
+            //console.log(goods,goods_aux)
             goods = {...goods_aux}
-            console.log("After:",goods);
+            //console.log("After:",goods);
             await this.db.goods.bulkPut(Object.values(goods));
         }).catch(err => {
             console.error(err.stack);
@@ -209,17 +259,17 @@ export class Database {
                 requiredGoods = Object.keys(building.cost),
                 goods = {};
             (await this.db.goods.bulkGet(requiredGoods)).forEach((resource, i) => goods[requiredGoods[i]] = resource)
-            console.log(goods)
+            //console.log(goods)
             const buildable = requiredGoods.every(resourceName => goods[resourceName].total >= building.cost[resourceName])
             if(!buildable) {
                 return
             }
             requiredGoods.forEach(resourceName => goods[resourceName].total -= building.cost[resourceName])
-            console.log("Updated Goods:", Object.values(goods))
+            //console.log("Updated Goods:", Object.values(goods))
             await this.db.goods.bulkPut(Object.values(goods))
             building.number += number
             await this.db.buildings.put(building)
-            console.log("built " + number +" more of this", building)
+            //console.log("built " + number +" more of this", building)
         }).then( () => { 
             this.update();
         }).catch(err => {
