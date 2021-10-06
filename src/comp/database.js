@@ -3,7 +3,7 @@ export class Database {
           this.db = new Dexie("assignan_database");
           this.db.version(1).stores({
               goods: 'name,income,total,valPU',
-              buildings: 'name,cost,number,yield_weekly,yield_const,value',
+              buildings: 'name,cost,number,yield_weekly,yield_const,value,buildable',
               time: 'name,year,week',
               population: 'name,total,adult,infant,housings',
               capacity: 'name,resources,food',
@@ -21,7 +21,7 @@ export class Database {
     };
 
     async initDatabase() {
-        this.assets = ["Wood","Stone","Silver","Marble","Glass","Gold","Grapes","Pottery","Furniture","Bread","Wheat","Beef","Fish","spiritual food","GP"];
+        this.assets = ["Wood","Stone","Silver","Marble","Glass","Gold","Grapes","Pottery","Furniture","Bread","Wheat","Beef","Fish","Spiritual Food","GP"];
         this.asset_num = [5475,25,12,220,625,5,40,60,0,1250,0,700,300,0,2658];
         this.asset_VPU = [1.5,3,50,10,4,100,2.5,2,6.5,0.1,0.1,0.3,0.2,0,1];
         
@@ -31,13 +31,14 @@ export class Database {
         }
         let goods ={};
 
-        this.infstr = ["House","Storehouse","Fishing Hut","Farm","Gristmill","Carpentry","Fiddler's Green"];
+        this.infstr = ["House","Storehouse","Fishing Hut","Farm","Gristmill","Carpentry","Fiddler's Green","Silver Mine - unskilled Workers","Silver Mine - skilled Workers","Fishing Village - Paris","Chapel - Lancellin","Inn"];
         this.infstr_cost = [{"Wood":150,"Stone":100,"GP":475},{"Wood":450,"Stone":300,"GP":925},{"Wood":50,"Stone":20,"GP":140},
             {"Wood":500,"Stone":200,"GP":1900},{"Wood":100,"Stone":75,"GP":300},{"Wood":150,"Stone":100,"GP":550},
-            {"Wood":125,"Stone":75,"GP":800}];
-        this.infstr_num  = [19,1,3,4,2,0,1];
-        this.yield_weekly= [{},{},{"Fish": 48},{"Beef": 80, "Wheat": 100},{"Wheat": -200, "Bread": 200, "GP": 2},{"Wood": -4,"Furniture":4},{}];
-        this.yield_const = [{"Housings":8},{"StorRes": 15000, "StorFood": 30000},{},{"Housings":4},{},{},{},];
+            {"Wood":125,"Stone":75,"GP":800},{},{},{},{"GP": 600},{"GP": 800}];
+        this.infstr_num  = [19,1,3,4,2,0,1,15,4,1,1,1];
+        this.yield_weekly= [{},{},{"Fish": 48},{"Beef": 80, "Wheat": 100},{"Wheat": -200, "Bread": 200, "GP": 2},{"Wood": -4,"Furniture":4},{},{"Silver": 0.064},{"Silver": 0.4},{"Fish": 100},{"Spiritual Food":240},{}];
+        this.yield_const = [{"Housings":8},{"StorRes": 15000, "StorFood": 30000},{},{"Housings":4},{},{},{},{},{},{},{},{}];
+        this.buildable = [true,true,true,true,true,true,true,false,false,false,false,false];
         (await this.db.goods.bulkGet(this.assets)).forEach((res,k)=> {goods[this.assets[k]] = res});
         
         for (let j=0; j<this.infstr.length;j++) {
@@ -48,7 +49,7 @@ export class Database {
 
             this.db.buildings.put({name: this.infstr[j],cost:this.infstr_cost[j], 
                                     number: this.infstr_num[j],yield_weekly:this.yield_weekly[j],yield_const:this.yield_const[j],
-                                    value: valueBuilding})
+                                    value: valueBuilding,buildable:this.buildable[j]})
         }
         await this.db.time.put({name:"Time",year: 1132, week:30});
         await this.db.population.put({name:"Population",total:167,adult:144,infant:23,housings:0});
@@ -177,11 +178,11 @@ export class Database {
             cell1.className = "cell" 
             cell1.innerHTML = aux.name
             cell2.className = "cell" 
-            cell2.innerHTML = aux.total
+            cell2.innerHTML = aux.total.toFixed(2)
             cell3.className = "cell" 
             cell3.innerHTML = aux.valPU
             cell4.className = "cell" 
-            cell4.innerHTML = aux.total*aux.valPU
+            cell4.innerHTML = (aux.total*aux.valPU).toFixed(2)
             cell5.className = "cell"
             cell5.innerHTML = aux.income
 
@@ -266,18 +267,25 @@ export class Database {
             
             cell5.innerHTML = txt_yield
 
-
-            btn.innerHTML   = "Build"
-            btn.id          = "btn-build-"+aux.name
-            btn.className   = "build"
-            btn.addEventListener("click", ()=>this.buildBuilding(aux.name,1))
-            
-
             container.appendChild(cell1)
             container.appendChild(cell2)
             container.appendChild(cell3)
             container.appendChild(cell5)
-            container.appendChild(btn)
+            console.log(aux)
+            if (aux.buildable === true) {
+                btn.innerHTML   = "Build"
+                btn.id          = "btn-build-"+aux.name
+                btn.className   = "build"
+                btn.addEventListener("click", ()=>this.buildBuilding(aux.name,1))
+                container.appendChild(btn)
+            }
+            else{
+                let btncell = document.createElement("div");
+                btncell.innerHTML="";
+                container.appendChild(btncell);
+            }
+
+            
 
             }
         let aux_val = await this.db.value.get("Value");
@@ -302,7 +310,7 @@ export class Database {
             Object.keys(incomes).forEach(building => {Object.keys(incomes[building]).forEach((resource,i) => { goods_aux[resource].income += Object.values(incomes[building])[i]*number[building];})});
             
             //Managing food consumption
-            cons -= goods_aux["spiritual food"].income
+            cons -= goods_aux["Spiritual Food"].income
             goods_aux["Fish"].income -= cons*0.25;
             goods_aux["Beef"].income -= cons*0.25;
             goods_aux["Bread"].income -= cons*0.5;
