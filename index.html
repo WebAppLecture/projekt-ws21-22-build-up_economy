@@ -10,8 +10,8 @@
     <body>
         <div class="centered gameBox">
             <div class="logo">Assignan - Economic Aspects</div>
-            <canvas class="screen on" width="400" height="600">Test</canvas>
-            <nav class="menu">
+            <canvas class="screen on" width="400" height="600"></canvas>
+            <nav class="menu" id="default">
                 <div class="controls">
                     <button id="btn-stat-tot" data-table="stat-tot">Statistics overall</button>
                     <button id="btn-stat-goods" data-table="stat-goods">Statistics goods</button>
@@ -21,7 +21,10 @@
                     <div class="grid hidden" id="stat-goods"></div>
                     <div class="grid hidden" id="build"></div>
             </nav>
-            <div id="reset" class="control reset" >menu</div>
+            <nav class="menu hidden" id="settings">
+                
+            </nav>
+            <div id="reset" class="control reset" >Settings</div>
             <div id="primary" class="control big-button A">1W</div>
             <div id="secondary" class="control big-button B">Q</div>
             <nav class="skin-change">

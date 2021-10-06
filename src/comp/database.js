@@ -20,6 +20,8 @@ export class Database {
         return new Promise(resolve => setTimeout(resolve, milliseconds));
     };
 
+
+    //Initializes the Database with certain values - will be replaced by external .json
     async initDatabase() {
         this.assets = ["Wood","Stone","Silver","Marble","Glass","Gold","Grapes","Pottery","Furniture","Bread","Wheat","Beef","Fish","Spiritual Food","GP"];
         this.asset_num = [5475,25,12,220,625,5,40,60,0,1250,0,700,300,0,2658];
@@ -59,6 +61,7 @@ export class Database {
         await this.db.value.put({name:"Value",total: 0,resources:0,buildings:0});
     }
 
+    //Is called when important things happen and an update is necessary
     async update(){
         await this.createStatGoods();
         await this.createStatBuild();
@@ -67,11 +70,15 @@ export class Database {
         await this.createStatGoods();
         await this.createStatTot();
     };
+
+    //Takes care of correct year/month
     async timeManager() {
         let time = await this.db.time.get("Time");
         if (time.week === 41) {time.year +=1; time.week = 1} else {time.week += 1}
         await this.db.time.put(time)
     };
+
+    //Adds the necessary calculations to the weekPassed function
     weekPassedComputations() {
         return this.db.transaction("rw",this.db.population,this.db.diplomacy,this.db.goods, async ()=>{
             let goods = {};
@@ -88,6 +95,7 @@ export class Database {
         })
     }
 
+    //Gathers information from subfunctions and executes them
     async weekPassed() {
         this.timeManager();
         this.weekPassedComputations();
@@ -358,6 +366,7 @@ export class Database {
         });
     };
  
+    //Builds a certain building "number" times and removes the necessary goods from the database
     async buildBuilding (name, number){
         this.db.transaction("rw",this.db.goods,this.db.buildings, async()=>{
             const building = await this.db.buildings.get(name),
@@ -383,11 +392,13 @@ export class Database {
         
     };
 
+    //Resets the properties of a certain good !!!CAUTION!!! Former information will be overwritten
     async putGood (Name,newInc,newTot){
         await this.db.goods.put({name: Name, income: newInc, total: newTot});
         this.update();
     };
 
+    //Adds a particular income or total add to a certain (possibly new) good
     async addGood (Name,addInc,addTot){
         this.db.transaction("rw",this.db.goods, async () => {
             let aux = await this.db.goods.get(Name);
@@ -398,25 +409,25 @@ export class Database {
         this.update();
     };
 
+    //Gives information about all goods - mainly for debugging purposes
     async getAllGoods () {
         let aux = await this.db.goods.bulkGet(this.assets);
         return aux;
     };
 
+    //Gives information about a specific good - mainly for debugging purposes
     async getGood (Name) {
         let aux = await this.db.goods.get(Name);
         return aux;
     };
 
+    //Gives information about all buildings - mainly for debugging purposes
     async getAllBuildings () {
         let aux = await this.db.buildings.bulkGet(this.infstr);
         return aux;
     };
 
-
-
-
-
+    //Gives information about a specific building - mainly for debugging purposes
     async getBuilding (Name) {
         let aux = await this.db.buildings.get(Name);
         console.log(aux);
