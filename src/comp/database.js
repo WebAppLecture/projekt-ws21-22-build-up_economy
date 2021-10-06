@@ -3,21 +3,33 @@ export class Database {
           this.db = new Dexie("assignan_database");
           this.db.version(1).stores({
               goods: 'name,income,total,valPU',
-              buildings: 'name,cost,number,yield_weekly,yield_const',
+              buildings: 'name,cost,number,yield_weekly,yield_const,value',
               time: 'name,year,week',
               population: 'name,total,adult,infant,housings',
               capacity: 'name,resources,food',
               diplomacy: 'name,fame,arcane',
               value: 'name,total,resources,buildings'
           });
+        
+        this.initDatabase();
+        this.update();
+        
+    };
+
+    async sleep(milliseconds) {
+        return new Promise(resolve => setTimeout(resolve, milliseconds));
+    };
+
+    async initDatabase() {
         this.assets = ["Wood","Stone","Silver","Marble","Glass","Gold","Grapes","Pottery","Furniture","Bread","Wheat","Beef","Fish","spiritual food","GP"];
-        this.asset_num = [5475,2500,12,220,625,5,40,60,0,1250,0,700,300,0,20658];
+        this.asset_num = [5475,25,12,220,625,5,40,60,0,1250,0,700,300,0,2658];
         this.asset_VPU = [1.5,3,50,10,4,100,2.5,2,6.5,0.1,0.1,0.3,0.2,0,1];
         
         
         for (let i=0;i<this.assets.length;i++) {
             this.db.goods.put({name:this.assets[i],income:0,total:this.asset_num[i],valPU:this.asset_VPU[i]});
         }
+        let goods ={};
 
         this.infstr = ["House","Storehouse","Fishing Hut","Farm","Gristmill","Carpentry","Fiddler's Green"];
         this.infstr_cost = [{"Wood":150,"Stone":100,"GP":475},{"Wood":450,"Stone":300,"GP":925},{"Wood":50,"Stone":20,"GP":140},
@@ -25,36 +37,37 @@ export class Database {
             {"Wood":125,"Stone":75,"GP":800}];
         this.infstr_num  = [19,1,3,4,2,0,1];
         this.yield_weekly= [{},{},{"Fish": 48},{"Beef": 80, "Wheat": 100},{"Wheat": -200, "Bread": 200, "GP": 2},{"Wood": -4,"Furniture":4},{}];
-        this.yield_const = [{"Housings":8},{"Stor-Res": 15000, "Stor-Food": 30000},{},{"Housings":4},{},{},{},];
+        this.yield_const = [{"Housings":8},{"StorRes": 15000, "StorFood": 30000},{},{"Housings":4},{},{},{},];
+        (await this.db.goods.bulkGet(this.assets)).forEach((res,k)=> {goods[this.assets[k]] = res});
+        
         for (let j=0; j<this.infstr.length;j++) {
+            let valueBuilding = 0;
+            Object.keys(this.infstr_cost[j]).forEach(resource =>{
+                valueBuilding += this.infstr_cost[j][resource]*goods[resource].valPU
+            })
+
             this.db.buildings.put({name: this.infstr[j],cost:this.infstr_cost[j], 
-                                    number: this.infstr_num[j],yield_weekly:this.yield_weekly[j],yield_const:this.yield_const[j]})
+                                    number: this.infstr_num[j],yield_weekly:this.yield_weekly[j],yield_const:this.yield_const[j],
+                                    value: valueBuilding})
         }
-        this.update();
-        this.firstUpdate();
-    };
-
-    async sleep(milliseconds) {
-        return new Promise(resolve => setTimeout(resolve, milliseconds));
-    };
-
-    async firstUpdate() {
         await this.db.time.put({name:"Time",year: 1132, week:30});
         await this.db.population.put({name:"Population",total:167,adult:144,infant:23,housings:0});
-        await this.db.capacity.put({name:"Capacity",resources:15000,food:30000});
+        await this.db.capacity.put({name:"Capacity",resources:0,food:0});
         
         await this.db.diplomacy.put({name:"Diplomacy",fame: 2,arcane:1});
         await this.db.value.put({name:"Value",total: 0,resources:0,buildings:0});
     }
 
     async update(){
-        
+        await this.createStatGoods();
         await this.createStatBuild();
-        await this.computeYield();
+        await this.computeWeeklyYield();
+        await this.computeConstantYield();
         await this.createStatGoods();
         await this.createStatTot();
     };
 
+    //Creates default page and computes current value of several assets and in total
     async createStatTot() {
         let container = document.getElementById("stat-tot");
         container.innerHTML="";
@@ -83,15 +96,20 @@ export class Database {
             cap_aux  = await this.db.capacity.get("Capacity"),
             dipl_aux = await this.db.diplomacy.get("Diplomacy"),
             val_aux  = await this.db.value.get("Value");
-        console.log(pop_aux,time_aux,cap_aux,dipl_aux,val_aux)
-        let pop_txt =""; for (let x in pop_aux) {pop_txt += x+": "+pop_aux[x] +" "}; pop.innerHTML = pop_txt; container.appendChild(pop);
-        let time_txt =""; for (let x in time_aux) {time_txt += x+": "+time_aux[x] +" "}; time.innerHTML = time_txt; container.appendChild(time);
-        let cap_txt =""; for (let x in cap_aux) {cap_txt += x+": "+cap_aux[x] +" "}; cap.innerHTML = cap_txt; container.appendChild(cap);
-        let dipl_txt =""; for (let x in dipl_aux) {dipl_txt += x+": "+dipl_aux[x] +" "}; dipl.innerHTML = dipl_txt; container.appendChild(dipl);
-        let val_txt =""; for (let x in val_aux) {val_txt += x+": "+val_aux[x] +" "}; val.innerHTML = val_txt; container.appendChild(val);
+
+        val_aux.total = val_aux.buildings + val_aux.resources
+        await this.db.value.put(val_aux);
+
+        //console.log(pop_aux,time_aux,cap_aux,dipl_aux,val_aux)
+        let pop_txt =""; for (let x in pop_aux) {pop_txt += x+": "+pop_aux[x] +" "}; pop.innerHTML = pop_txt.replace("name:",""); container.appendChild(pop);
+        let time_txt =""; for (let x in time_aux) {time_txt += x+": "+time_aux[x] +" "}; time.innerHTML = time_txt.replace("name:",""); container.appendChild(time);
+        let cap_txt =""; for (let x in cap_aux) {cap_txt += x+": "+cap_aux[x] +" "}; cap.innerHTML = cap_txt.replace("name:",""); container.appendChild(cap);
+        let dipl_txt =""; for (let x in dipl_aux) {dipl_txt += x+": "+dipl_aux[x] +" "}; dipl.innerHTML = dipl_txt.replace("name:",""); container.appendChild(dipl);
+        let val_txt =""; for (let x in val_aux) {val_txt += x+": "+val_aux[x] +" "}; val.innerHTML = val_txt.replace("name:",""); container.appendChild(val);
 
         };
 
+    //Creates Statistic page for goods and computes total value of goods for default page
     async createStatGoods() {
         let container = document.getElementById("stat-goods");
         container.innerHTML="";
@@ -121,7 +139,7 @@ export class Database {
         for (let i=1;i<=5;i++){
             container.appendChild(document.createElement("hr"))
         };
-
+        let valueGoods = 0;
         for (let i=0;i<this.assets.length;i++) {
             let cell1 = document.createElement("div"), 
                 cell2 = document.createElement("div"), 
@@ -129,6 +147,7 @@ export class Database {
                 cell4 = document.createElement("div"),
                 cell5 = document.createElement("div");
             let aux = await this.db.goods.get(this.assets[i])
+            valueGoods+=aux.total*aux.valPU
             cell1.className = "cell" 
             cell1.innerHTML = aux.name
             cell2.className = "cell" 
@@ -147,8 +166,12 @@ export class Database {
             container.appendChild(cell4)
 
             }
+        let aux_val = await this.db.value.get("Value");
+        aux_val.resources = valueGoods;
+        await this.db.value.put(aux_val)
     };
 
+    //Creates the statisticspage for buildings and computes their total value
     async createStatBuild() {
         let container = document.getElementById("build");
         container.innerHTML="";
@@ -174,10 +197,11 @@ export class Database {
         container.appendChild(cell5)
         container.appendChild(cell4)
         
+        
         for (let i=1;i<=5;i++){
             container.appendChild(document.createElement("hr"))
         };
-
+        let valueBuildings = 0;
         for (let i=0;i<this.infstr.length;i++) {
             let cell1 = document.createElement("div"), 
                 cell2 = document.createElement("div"), 
@@ -185,6 +209,8 @@ export class Database {
                 cell5 = document.createElement("div"),
                 btn = document.createElement("button");
             let aux = await this.db.buildings.get(this.infstr[i])
+            valueBuildings += aux.value*aux.number
+            //console.log(aux,valueBuildings)
             cell1.className = "cell" 
             cell1.innerHTML = aux.name
             cell2.className = "cell" 
@@ -228,10 +254,13 @@ export class Database {
             container.appendChild(btn)
 
             }
+        let aux_val = await this.db.value.get("Value");
+        aux_val.buildings = valueBuildings;
+        await this.db.value.put(aux_val)
     };
 
-    
-    computeYield() {
+    //Computes the yield per week writes them into the goods database
+    computeWeeklyYield() {
         return this.db.transaction("rw",this.db.goods,this.db.buildings, async()=>{
             let incomes = {},
                 goods = {},
@@ -248,6 +277,42 @@ export class Database {
             goods = {...goods_aux}
             //console.log("After:",goods);
             await this.db.goods.bulkPut(Object.values(goods));
+        }).catch(err => {
+            console.error(err.stack);
+        });
+    };
+
+    //Computes the constant yields and writes them into the stat overall databases
+    computeConstantYield() {
+        return this.db.transaction("rw",this.db.capacity,this.db.population,this.db.buildings, async()=>{
+            let incomes = {},
+                number = {},
+                auxYield = {"food":0,"resources":0,"housings":0},
+                aux_stor = await this.db.capacity.get("Capacity"),
+                aux_pop = await this.db.population.get("Population");
+            (await this.db.buildings.bulkGet(this.infstr)).forEach((building, j) => {incomes[this.infstr[j]] = building.yield_const, number[this.infstr[j]]=building.number});
+            //console.log(incomes,number);
+            Object.keys(incomes).forEach( building =>{
+                if (incomes[building].Housings != undefined) {
+                    //console.log(building,incomes[building],number[building],incomes[building].Housings); 
+                    auxYield.housings+=incomes[building].Housings*number[building]
+                }
+                if (incomes[building].StorFood != undefined) {
+                    //console.log(building,incomes[building],number[building],incomes[building].StorFood);
+                    auxYield.food+=incomes[building].StorFood*number[building]
+                }
+                if (incomes[building].StorRes != undefined) {
+                    //console.log(building,incomes[building],number[building],incomes[building].StorRes); 
+                    auxYield.resources+=incomes[building].StorRes*number[building]
+                }
+            })
+            //console.log("After:",auxYield)
+            aux_stor.food = auxYield.food;
+            aux_stor.resources = auxYield.resources;
+            aux_pop.housings = auxYield.housings;
+            //console.log("Check",aux_stor,aux_pop)
+            await this.db.capacity.put(aux_stor)
+            await this.db.population.put(aux_pop)
         }).catch(err => {
             console.error(err.stack);
         });
