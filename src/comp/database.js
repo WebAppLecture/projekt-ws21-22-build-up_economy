@@ -271,7 +271,7 @@ export class Database {
             container.appendChild(cell2)
             container.appendChild(cell3)
             container.appendChild(cell5)
-            console.log(aux)
+
             if (aux.buildable === true) {
                 btn.innerHTML   = "Build"
                 btn.id          = "btn-build-"+aux.name
