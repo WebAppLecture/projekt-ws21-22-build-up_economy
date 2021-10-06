@@ -261,21 +261,27 @@ export class Database {
 
     //Computes the yield per week writes them into the goods database
     computeWeeklyYield() {
-        return this.db.transaction("rw",this.db.goods,this.db.buildings, async()=>{
+        return this.db.transaction("rw",this.db.population,this.db.goods,this.db.buildings, async()=>{
             let incomes = {},
                 goods = {},
                 number = {};
             (await this.db.buildings.bulkGet(this.infstr)).forEach((building, j) => {incomes[this.infstr[j]] = building.yield_weekly, number[this.infstr[j]]=building.number});
-            //console.log(incomes,number);
             (await this.db.goods.bulkGet(this.assets)).forEach((res,k)=> {goods[this.assets[k]] = res});
             
+            const pops = await this.db.population.get("Population");
+            let cons = 8*(pops.adult+0.5*pops.infant);
             let goods_aux = {...goods};
-            //console.log("Before:",goods_aux);
+            
             Object.keys(goods_aux).forEach(resource => goods_aux[resource].income = 0);
             Object.keys(incomes).forEach(building => {Object.keys(incomes[building]).forEach((resource,i) => { goods_aux[resource].income += Object.values(incomes[building])[i]*number[building];})});
-            //console.log(goods,goods_aux)
-            goods = {...goods_aux}
-            //console.log("After:",goods);
+            
+            //Managing food consumption
+            cons -= goods_aux["spiritual food"].income
+            goods_aux["Fish"].income -= cons*0.25;
+            goods_aux["Beef"].income -= cons*0.25;
+            goods_aux["Bread"].income -= cons*0.5;
+            
+            goods = {...goods_aux} 
             await this.db.goods.bulkPut(Object.values(goods));
         }).catch(err => {
             console.error(err.stack);
