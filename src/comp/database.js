@@ -66,6 +66,32 @@ export class Database {
         await this.createStatGoods();
         await this.createStatTot();
     };
+    async timeManager() {
+        let time = await this.db.time.get("Time");
+        if (time.week === 41) {time.year +=1; time.week = 1} else {time.week += 1}
+        await this.db.time.put(time)
+    };
+    weekPassedComputations() {
+        return this.db.transaction("rw",this.db.population,this.db.diplomacy,this.db.goods, async ()=>{
+            let goods = {};
+            let diplDB = await this.db.diplomacy.get("Diplomacy"), popsDB = await this.db.population.get("Population");
+            (await this.db.goods.bulkGet(this.assets)).forEach((res,k)=> {goods[this.assets[k]] = res});
+            Object.keys(goods).forEach(res =>{
+                goods[res].total += goods[res].income
+            });
+            await this.db.goods.bulkPut(Object.values(goods));
+            popsDB.adult += 0.75*diplDB.fame;
+            popsDB.infant+= 0.25*diplDB.fame;
+            popsDB.total = popsDB.adult + popsDB.infant;
+            await this.db.population.put(popsDB);
+        })
+    }
+
+    async weekPassed() {
+        this.timeManager();
+        this.weekPassedComputations();
+        this.update();
+    };
 
     //Creates default page and computes current value of several assets and in total
     async createStatTot() {
