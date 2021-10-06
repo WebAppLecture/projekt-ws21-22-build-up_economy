@@ -12,6 +12,7 @@ export class Database {
           });
         
         this.initDatabase();
+        this.initSettings();
         this.update();
         
     };
@@ -71,6 +72,77 @@ export class Database {
         await this.createStatTot();
     };
 
+    //Initializing Settings page
+    async initSettings() {
+        this.createItemsAdd();
+        let add = document.getElementById("AddingGoods"),
+            inputs = Array.from(add.querySelectorAll("input")),
+            btn = add.querySelector("button"),
+            ops = document.getElementById("opt");
+        let abort = false;
+        await btn.addEventListener("click", async () => {
+            let inpValTot = inputs[1].value;
+            if(inputs[0].value.length === 0 || inputs[1].value.length === 0){
+                console.log("Error");
+                abort = true;
+            }
+            if (abort === false){
+                if (ops.selectedOptions[0].text==="Remove") {
+                     inpValTot *= -1;
+                }
+                await this.addGood(inputs[0].value,0,inpValTot*1,inputs[2].value*1)
+            }
+        });
+    };
+
+    //Create necessary HTML in settings page
+    createItemsAdd() {
+        let container = document.getElementById("settings");
+        container.innerHTML="";
+        let head = document.createElement("h1"), Add = document.createElement("div");
+        Add.id = "AddingGoods"
+        head.innerHTML = "Add new items";
+        container.appendChild(head);
+
+        let inpName = document.createElement("input");
+        inpName.placeholder="Add new item's name"
+        inpName.type = "text"
+        inpName.required = true
+        inpName.id="inpName"
+        Add.appendChild(inpName);
+
+        let op = document.createElement("select"),
+            option1 = document.createElement("option"),
+            option2 = document.createElement("option");
+        option1.value = 0;
+        option1.innerText = "Add";
+        
+        op.appendChild(option1);
+
+        option2.value = 1;
+        option2.innerText = "Remove";
+        op.appendChild(option2);
+        op.id ="opt";
+        Add.appendChild(op)
+
+        let inpTotal = document.createElement("input");
+        inpTotal.placeholder="Stored units"
+        inpTotal.type = "number"
+        inpTotal.id="inpTotal"
+        Add.appendChild(inpTotal);
+
+        let inpVal = document.createElement("input");
+        inpVal.placeholder="Value p.U."
+        inpVal.type = "number"
+        inpVal.id="inpVal"
+        Add.appendChild(inpVal);
+
+        let btn = document.createElement("button");
+        btn.innerHTML="▶"
+        Add.appendChild(btn)
+        container.appendChild(Add)
+    };
+    
     //Takes care of correct year/month
     async timeManager() {
         let time = await this.db.time.get("Time");
@@ -398,15 +470,19 @@ export class Database {
         this.update();
     };
 
-    //Adds a particular income or total add to a certain (possibly new) good
-    async addGood (Name,addInc,addTot){
+    //Adds a particular income or total to a certain (possibly new) good
+    async addGood (Name,addInc,addTot,valPU){
         this.db.transaction("rw",this.db.goods, async () => {
             let aux = await this.db.goods.get(Name);
-            aux.total += addTot;
-            aux.income+= addInc;
-            await this.db.goods.put(aux);
-        })
-        this.update();
+            if (this.assets.includes(Name)===false) {
+                this.assets.push(Name)
+                await this.db.goods.put({name: Name, income: addInc, total: addTot,valPU:valPU});
+            }
+            else{
+                aux.total += addTot;
+                await this.db.goods.put(aux);
+            }
+        }).then(this.update())
     };
 
     //Gives information about all goods - mainly for debugging purposes

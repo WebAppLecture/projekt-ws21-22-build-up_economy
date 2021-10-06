@@ -18,6 +18,11 @@ table {
 #stat-tot {
     grid-template-columns: auto auto;
 }
+#settings {
+    color: white;
+    display: grid;
+    grid-template-columns: auto;
+}
 .hr {
     width: 300%;
     border-style: solid;
