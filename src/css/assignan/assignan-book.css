@@ -20,7 +20,7 @@
 .accent::before {
     display: block;
     position: absolute;
-    content: var(--accent-textforbook);
+    content: var(--accent-content);
     font-size: 1.6vh;
     color: brown;
     top: 25%;

@@ -300,7 +300,7 @@ export class Database {
         this.weekPassedComputations();
         let acc = document.querySelector(".accent");
         console.log(acc.style,time);
-        acc.style.setProperty('--accent-textforbook',"As");
+        acc.style.setProperty('--accent-content',"Assignan - after");
         this.update();
     };
 
