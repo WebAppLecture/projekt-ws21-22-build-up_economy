@@ -1,6 +1,10 @@
 @import url("./game-box.css");
 @import url("./controls.css");
 
+:root {
+    --accent-textforbook: "Assignan";
+}
+
 table {
     border-collapse: separate;
     border-spacing: 0em 0px;

@@ -26,11 +26,11 @@
                 
             </nav>
             <div id="saveload">
-                <button id="save">
+                <button id="save" class="reset">
                     Save
                 </button>
-                <input type="file" id="load" accept="application/json">
-                <input type="button" value="Load" onclick="document.getElementById('load').click();" />
+                <input type="file" id="load"  accept="application/json">
+                <input type="button" class="reset" value="Load" onclick="document.getElementById('load').click();" />
             </div>
             <div id="reset" class="control reset" >Settings</div>
             <div id="primary" class="control big-button A">Week passed</div>
@@ -40,7 +40,7 @@
                 <div class="next">></div>
             </nav>
         
-            <div class="accent"></div>
+            <div class="accent" id="book"></div>
         </div>
     </body>
 </html>

@@ -3,7 +3,7 @@ export class Database {
           this.db = new Dexie("assignan_database");
           this.db.version(1).stores({
               goods: 'name,income,total,valPU',
-              buildings: 'name,cost,number,yield_weekly,yield_const,value,buildable',
+              buildings: 'name,cost,number,yield_weekly,yield_const,value,buildable,variable',
               time: 'name,year,week',
               population: 'name,total,adult,infant,housings',
               capacity: 'name,resources,food',
@@ -59,7 +59,7 @@ export class Database {
         this.yield_weekly= [{},{},{"Fish": 48},{"Beef": 80, "Wheat": 100},{"Wheat": -200, "Bread": 200, "GP": 2},{"Wood": -4,"Furniture":4},{},{"Silver": 0.064},{"Silver": 0.4},{"Fish": 100},{"Spiritual Food":240},{}];
         this.yield_const = [{"Housings":8},{"StorRes": 15000, "StorFood": 30000},{},{"Housings":4},{},{},{},{},{},{},{},{}];
         this.buildable = [true,true,true,true,true,true,true,false,false,false,false,false];
-        
+        this.variable = [false,false,false,false,false,false,false,true,true,false,false,false]
         for (let j=0; j<this.infstr.length;j++) {
             let valueBuilding = 0;
             Object.keys(this.infstr_cost[j]).forEach(resource =>{
@@ -68,7 +68,7 @@ export class Database {
 
             this.db.buildings.put({name: this.infstr[j],cost:this.infstr_cost[j], 
                                     number: this.infstr_num[j],yield_weekly:this.yield_weekly[j],yield_const:this.yield_const[j],
-                                    value: valueBuilding,buildable:this.buildable[j]})
+                                    value: valueBuilding,buildable:this.buildable[j],variable:this.variable[j]})
         }
         await this.db.time.put({name:"Time",year: 1132, week:30});
         await this.db.population.put({name:"Population",total:167,adult:144,infant:23,housings:0});
@@ -121,11 +121,16 @@ export class Database {
             btnBuild = buildAdd.querySelector("button");
         
         await btnBuild.addEventListener("click", async () => {
-                this.db.transaction("rw",this.db.buildings, async () => {
-                    this.db.buildings.put({name: inputsBuilds[0].value,cost:{}, number: 1,yield_weekly: {[selectsBuilds[1].value]: inputsBuilds[2].value},yield_const: {[selectsBuilds[0].value]: inputsBuilds[1].value}, value: 0,buildable: false})});
+            this.db.transaction("rw",this.db.buildings, async () => {
+                    this.db.buildings.put({name: inputsBuilds[0].value,cost:{}, number: 1,yield_weekly: {[selectsBuilds[1].value]: inputsBuilds[2].value},
+                        yield_const: {[selectsBuilds[0].value]: inputsBuilds[1].value}, value: 0,buildable: false,variable:selectsBuilds[2].value})}).then(
+                            async () => {await this.update(); await this.createStatBuild();}
+                        );  
         })
-        await this.createStatBuild();
+        
     };
+
+    //Create new buildings, which are not buildable, but possibly with variable worker number
     async createBuildingsAdd () {
         let container = document.getElementById("settings");
         let head = document.createElement("h1"), Add = document.createElement("div");
@@ -269,6 +274,7 @@ export class Database {
         let time = await this.db.time.get("Time");
         if (time.week === 41) {time.year +=1; time.week = 1} else {time.week += 1}
         await this.db.time.put(time)
+        return time
     };
 
     //Adds the necessary calculations to the weekPassed function
@@ -290,8 +296,11 @@ export class Database {
 
     //Gathers information from subfunctions and executes them
     async weekPassed() {
-        this.timeManager();
+        let time = await this.timeManager();
         this.weekPassedComputations();
+        let acc = document.querySelector(".accent");
+        console.log(acc.style,time);
+        acc.style.setProperty('--accent-textforbook',"As");
         this.update();
     };
 
@@ -414,7 +423,7 @@ export class Database {
             cell4.className = "cell" 
             cell4.innerHTML = (good.total*good.valPU).toFixed(2)
             cell5.className = "cell"
-            cell5.innerHTML = good.income
+            cell5.innerHTML = good.income.toFixed(2);
 
             container.appendChild(cell1)
             container.appendChild(cell2)
@@ -465,7 +474,8 @@ export class Database {
                 cell2 = document.createElement("div"), 
                 cell3 = document.createElement("div"),
                 cell5 = document.createElement("div"),
-                btn = document.createElement("button");
+                btn = document.createElement("button"),
+                slct = document.createElement("select");
             let aux = build
             valueBuildings += aux.value*aux.number
             cell1.className = "cell" 
@@ -476,8 +486,31 @@ export class Database {
                 txt_cost += x+": "+aux.cost[x] +" ";
             };
             cell2.innerHTML = txt_cost
-            cell3.className = "cell" 
-            cell3.innerHTML = aux.number
+            container.appendChild(cell1)
+            container.appendChild(cell2)
+
+            if (aux.variable) {
+                for (let i = 0;i<=100;i++) {
+                    let opt = document.createElement("option");
+                    opt.value = i;
+                    opt.innerText = i;
+                    if(i === aux.number) {opt.selected = "selected"};
+                    slct.appendChild(opt);
+                };
+                slct.addEventListener("change", async (e)=> {
+                    aux.number = slct.value*1;
+                    await this.db.buildings.put(aux);
+                    await this.update();
+                });
+                container.appendChild(slct);
+            }
+            else {
+                cell3.className = "cell" 
+                cell3.innerHTML = aux.number
+                container.appendChild(cell3)
+            };
+
+            
             cell5.className = "cell"
             let txt_yield = "";
             if (Object.keys(aux.yield_weekly) != 0) {
@@ -496,10 +529,6 @@ export class Database {
             };
             
             cell5.innerHTML = txt_yield
-
-            container.appendChild(cell1)
-            container.appendChild(cell2)
-            container.appendChild(cell3)
             container.appendChild(cell5)
 
             if (aux.buildable === true) {
