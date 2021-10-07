@@ -114,8 +114,98 @@ export class Database {
                 await this.addGood(inputs[0].value,0,inpValTot*1,inputs[2].value*1)
             }
         });
+        await this.createBuildingsAdd();
     };
+    async createBuildingsAdd () {
+        let container = document.getElementById("settings");
+        let head = document.createElement("h1"), Add = document.createElement("div");
+        Add.id ="AddingBuilds";
+        head.innerHTML = "Add new buildings";
+        container.appendChild(head);
+        let inpName = document.createElement("input");
+        let datalist = document.createElement("datalist");
+        let builds = await this.getAllBuildings();
+        console.log(builds);
+        builds.forEach( building => {
+            let opt = document.createElement("option");
+            opt.value = building.name;
+            datalist.appendChild(opt);
+        })
+        datalist.id = "buildlist"
+        inpName.setAttribute('list', "buildlist");
+        inpName.placeholder="Add name"
+        inpName.type = "text"
+        inpName.required = true
+        inpName.id="inpName"
+        Add.appendChild(datalist);
+        Add.appendChild(inpName);
 
+
+        let optTotalYield = document.createElement("select"),
+            optionempty = document.createElement("option"),
+            optionHous = document.createElement("option"),
+            optionStorRes = document.createElement("option"),
+            optionStorFood = document.createElement("option");
+        optionempty.value = 0;
+        optionempty.innerText = "---"
+        optionempty.selected ="selected";
+        optionHous.innerText = "Housings";
+        optionStorRes.innerText = "Storage Resources";
+        optionStorFood.innerText = "Storage Food";
+        optTotalYield.appendChild(optionempty);
+        optTotalYield.appendChild(optionHous);
+        optTotalYield.appendChild(optionStorRes);
+        optTotalYield.appendChild(optionStorFood);
+        Add.appendChild(optTotalYield)
+
+        let inpTotalYieldNumber = document.createElement("input");
+        inpTotalYieldNumber.placeholder="Constant Yield - Number"
+        inpTotalYieldNumber.type = "number"
+        inpTotalYieldNumber.id="inpTotalYieldNumber"
+        Add.appendChild(inpTotalYieldNumber);
+
+
+        let optWeeklyYield = document.createElement("select"),
+        optionemptyWeekly = document.createElement("option");
+        optionemptyWeekly.value = 0;
+        optionemptyWeekly.innerText = "---";
+        optionemptyWeekly.selected ="selected";
+        let goods = await this.getAllGoods();
+        Object.keys(goods).forEach(name => {
+            let optGood = document.createElement("option");
+            optGood.innerText = name;
+            optGood.value = 1;
+            optWeeklyYield.appendChild(optGood);
+        });
+        optWeeklyYield.appendChild(optionemptyWeekly);
+        Add.appendChild(optWeeklyYield)
+
+
+        let inpWeeklyYieldNumber = document.createElement("input");
+        inpWeeklyYieldNumber.placeholder="Weekly Income - Number"
+        inpWeeklyYieldNumber.type = "number"
+        inpWeeklyYieldNumber.id="inpWeeklyYieldNumber"
+        Add.appendChild(inpWeeklyYieldNumber);
+
+        let op = document.createElement("select"),
+            option1 = document.createElement("option"),
+            option2 = document.createElement("option");
+        option1.value = true;
+        option1.innerText = "Buildable";
+        op.appendChild(option1);
+        option2.value = false;
+        option2.innerText = "Not buildable";
+        option2.selected = "selected";
+        op.appendChild(option2);
+        op.id ="optionsBuild";
+        Add.appendChild(op)
+
+        let btn = document.createElement("button");
+        btn.innerHTML="▶"
+        Add.appendChild(btn)
+
+        container.appendChild(Add);
+    };
     //Create necessary HTML in settings page
     async createItemsAdd() {
         let container = document.getElementById("settings");
@@ -147,9 +237,7 @@ export class Database {
             option2 = document.createElement("option");
         option1.value = 0;
         option1.innerText = "Add";
-        
         op.appendChild(option1);
-
         option2.value = 1;
         option2.innerText = "Remove";
         op.appendChild(option2);

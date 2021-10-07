@@ -66,9 +66,7 @@
     overflow: hidden;
     text-align: center;
 }
-.big-button:active {
-    /* font-size: 5.3vh; */
-}
+
 .A {
     width:  6vh;
     height: 6vh;
