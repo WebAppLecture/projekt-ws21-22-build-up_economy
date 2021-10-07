@@ -42,4 +42,5 @@ btn_settings.addEventListener("click", (btn) => {
 
 let DataAs = new Database();
 
+
 btn_weekpsd.addEventListener("click", () => DataAs.weekPassed())

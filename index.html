@@ -17,6 +17,7 @@
                     <button id="btn-stat-goods" data-table="stat-goods">Statistics goods</button>
                     <button id="btn-build" data-table="build">Buildings</button>
                 </div>
+                    <h1 id="loadfirst" class="">You have to load a .json first!</h1>
                     <div class="grid" id="stat-tot"></div>
                     <div class="grid hidden" id="stat-goods"></div>
                     <div class="grid hidden" id="build"></div>
@@ -24,9 +25,16 @@
             <nav class="menu hidden" id="settings">
                 
             </nav>
+            <div id="saveload">
+                <button id="save">
+                    Save
+                </button>
+                <input type="file" id="load" accept="application/json">
+                <input type="button" value="Browse..." onclick="document.getElementById('load').click();" />
+            </div>
             <div id="reset" class="control reset" >Settings</div>
-            <div id="primary" class="control big-button A">1W</div>
-            <div id="secondary" class="control big-button B">Q</div>
+            <div id="primary" class="control big-button A">Week passed</div>
+            <div id="secondary" class="control big-button B">Manual</div>
             <nav class="skin-change">
                 <div class="previous"><</div>
                 <div class="next">></div>

@@ -61,12 +61,10 @@
 }
 
 .big-button {
-    /*box-shadow: 0 0 .6vh 0 black,
-        1vh 1vh .5vh .1vh inset var(--bright-gold-trans), 
-        0 0 0 .8vh inset var(--dark-gold-trans);*/
-
-    line-height: 7vh;
-    font-size: 5.5vh;
+    line-height: 25px;
+    font-size: 15px;
+    overflow: hidden;
+    text-align: center;
 }
 .big-button:active {
     /* font-size: 5.3vh; */
@@ -84,14 +82,12 @@
     yellow 0deg,
     orange 30deg,
     yellow 60deg);
-    font-size: 2vh;
 }
 .A:active {
     position: absolute;
     right: 50vh;
     box-shadow: 0 0 .6vh 0 rgb(245, 245, 116),
     0 0 0 2vh inset rgb(245, 245, 116);
-    font-size: 3vh;
 }
 .B {
     width:  6vh;
@@ -99,7 +95,6 @@
     background: white;
     color: transparent;
     font-size: 2vh;
-    overflow: hidden;
 }
 
 .B::after, .B::before {
@@ -112,11 +107,15 @@
 }
 
 .B::after {
-    content: "Q";
+    content: "Manual";
     color: white;
     text-shadow: 0 0 .5em black;
     background: transparent;
     z-index: 2;
+    line-height: 45px;
+    font-size: 15px;
+    overflow: hidden;
+    text-align: center;
 }
 
 .B::before {
@@ -143,7 +142,7 @@
 
 
 .reset:active {
-    font-size: 2.2vh;
+    font-size: 2vh;
 }
 
 .skin-change > div {

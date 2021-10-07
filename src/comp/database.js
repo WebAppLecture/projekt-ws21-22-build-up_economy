@@ -10,11 +10,28 @@ export class Database {
               diplomacy: 'name,fame,arcane',
               value: 'name,total,resources,buildings'
           });
-        
-        this.initDatabase();
+
+
+        let btn_save = document.querySelector("button#save"),
+            inp_load = document.querySelector("input#load");
+
+            btn_save.addEventListener("click", () =>{
+                this.saveDB();
+            });
+            inp_load.addEventListener("change", (e) => {
+                let reader = new FileReader();
+                reader.addEventListener("load", (ev) => this.loadDB(ev.target.result));
+                reader.readAsText(e.target.files[0]);
+            });
+
+        //this.initDatabase();
         this.initSettings();
-        this.update();
-        
+        this.getAllGoods().then((goods)=>{
+            if (Object.keys(goods).length > 0) {
+                this.update();
+            }
+        })
+        //this.update();
     };
 
     async sleep(milliseconds) {
@@ -32,7 +49,7 @@ export class Database {
         for (let i=0;i<this.assets.length;i++) {
             this.db.goods.put({name:this.assets[i],income:0,total:this.asset_num[i],valPU:this.asset_VPU[i]});
         }
-        let goods ={};
+        let goods = await this.getAllGoods();
 
         this.infstr = ["House","Storehouse","Fishing Hut","Farm","Gristmill","Carpentry","Fiddler's Green","Silver Mine - unskilled Workers","Silver Mine - skilled Workers","Fishing Village - Paris","Chapel - Lancellin","Inn"];
         this.infstr_cost = [{"Wood":150,"Stone":100,"GP":475},{"Wood":450,"Stone":300,"GP":925},{"Wood":50,"Stone":20,"GP":140},
@@ -42,7 +59,6 @@ export class Database {
         this.yield_weekly= [{},{},{"Fish": 48},{"Beef": 80, "Wheat": 100},{"Wheat": -200, "Bread": 200, "GP": 2},{"Wood": -4,"Furniture":4},{},{"Silver": 0.064},{"Silver": 0.4},{"Fish": 100},{"Spiritual Food":240},{}];
         this.yield_const = [{"Housings":8},{"StorRes": 15000, "StorFood": 30000},{},{"Housings":4},{},{},{},{},{},{},{},{}];
         this.buildable = [true,true,true,true,true,true,true,false,false,false,false,false];
-        (await this.db.goods.bulkGet(this.assets)).forEach((res,k)=> {goods[this.assets[k]] = res});
         
         for (let j=0; j<this.infstr.length;j++) {
             let valueBuilding = 0;
@@ -64,17 +80,23 @@ export class Database {
 
     //Is called when important things happen and an update is necessary
     async update(){
+        this.getAllGoods().then((goods)=>{
+            if (Object.keys(goods).length > 0) {
+                let loadtxt = document.querySelector("#loadfirst");
+                loadtxt.className ="hidden";
+            }});
         await this.createStatGoods();
         await this.createStatBuild();
         await this.computeWeeklyYield();
         await this.computeConstantYield();
         await this.createStatGoods();
         await this.createStatTot();
+        await this.initSettings();
     };
 
     //Initializing Settings page
     async initSettings() {
-        this.createItemsAdd();
+        await this.createItemsAdd();
         let add = document.getElementById("AddingGoods"),
             inputs = Array.from(add.querySelectorAll("input")),
             btn = add.querySelector("button"),
@@ -83,7 +105,6 @@ export class Database {
         await btn.addEventListener("click", async () => {
             let inpValTot = inputs[1].value;
             if(inputs[0].value.length === 0 || inputs[1].value.length === 0){
-                console.log("Error");
                 abort = true;
             }
             if (abort === false){
@@ -96,7 +117,7 @@ export class Database {
     };
 
     //Create necessary HTML in settings page
-    createItemsAdd() {
+    async createItemsAdd() {
         let container = document.getElementById("settings");
         container.innerHTML="";
         let head = document.createElement("h1"), Add = document.createElement("div");
@@ -105,10 +126,20 @@ export class Database {
         container.appendChild(head);
 
         let inpName = document.createElement("input");
+        let datalist = document.createElement("datalist");
+        let goods = await this.getAllGoods();
+        Object.keys(goods).forEach( name => {
+            let opt = document.createElement("option");
+            opt.value = name;
+            datalist.appendChild(opt);
+        })
+        datalist.id = "goodlist"
+        inpName.setAttribute('list', "goodlist");
         inpName.placeholder="Add new item's name"
         inpName.type = "text"
         inpName.required = true
         inpName.id="inpName"
+        Add.appendChild(datalist);
         Add.appendChild(inpName);
 
         let op = document.createElement("select"),
@@ -153,9 +184,9 @@ export class Database {
     //Adds the necessary calculations to the weekPassed function
     weekPassedComputations() {
         return this.db.transaction("rw",this.db.population,this.db.diplomacy,this.db.goods, async ()=>{
-            let goods = {};
+            let goods = await this.getAllGoods();
             let diplDB = await this.db.diplomacy.get("Diplomacy"), popsDB = await this.db.population.get("Population");
-            (await this.db.goods.bulkGet(this.assets)).forEach((res,k)=> {goods[this.assets[k]] = res});
+            
             Object.keys(goods).forEach(res =>{
                 goods[res].total += goods[res].income
             });
@@ -178,10 +209,7 @@ export class Database {
     async createStatTot() {
         let container = document.getElementById("stat-tot");
         container.innerHTML="";
-        let cell1 = document.createElement("div"), 
-                cell2 = document.createElement("div"), 
-                cell3 = document.createElement("div"),
-                cell4 = document.createElement("div"),
+        let cell1 = document.createElement("div"),
                 head = document.createElement("h1");
         head.innerHTML = "Assignan"
         let img = document.createElement("img");
@@ -207,15 +235,44 @@ export class Database {
         val_aux.total = val_aux.buildings + val_aux.resources
         await this.db.value.put(val_aux);
 
-        //console.log(pop_aux,time_aux,cap_aux,dipl_aux,val_aux)
         let pop_txt =""; for (let x in pop_aux) {pop_txt += x+": "+pop_aux[x] +" "}; pop.innerHTML = pop_txt.replace("name:",""); container.appendChild(pop);
         let time_txt =""; for (let x in time_aux) {time_txt += x+": "+time_aux[x] +" "}; time.innerHTML = time_txt.replace("name:",""); container.appendChild(time);
         let cap_txt =""; for (let x in cap_aux) {cap_txt += x+": "+cap_aux[x] +" "}; cap.innerHTML = cap_txt.replace("name:",""); container.appendChild(cap);
         let dipl_txt =""; for (let x in dipl_aux) {dipl_txt += x+": "+dipl_aux[x] +" "}; dipl.innerHTML = dipl_txt.replace("name:",""); container.appendChild(dipl);
         let val_txt =""; for (let x in val_aux) {val_txt += x+": "+val_aux[x] +" "}; val.innerHTML = val_txt.replace("name:",""); container.appendChild(val);
 
+        
         };
 
+    //Save the databases as file
+    async saveDB() {
+        let file = new Blob( [JSON.stringify({
+            goods:      await this.db.goods.toArray(),
+            buildings:  await this.db.buildings.toArray(),
+            time:       await this.db.time.toArray(),
+            population: await this.db.population.toArray(),
+            capacity:   await this.db.capacity.toArray(),
+            diplomacy:  await this.db.diplomacy.toArray(),
+            value:      await this.db.value.toArray()
+        },null,4)],{type: "application/json"});
+        const a= document.createElement("a");
+
+        a.href = URL.createObjectURL(file);
+        a.download = "Assignan_databases_"+ (new Date()).toDateString().replaceAll(" ", "_")+".json";
+        a.click();
+
+        URL.revokeObjectURL(a.href);
+    };
+
+    loadDB(file) {
+        const data = JSON.parse(file);
+        this.db.transaction("rw",this.db.goods,this.db.buildings,this.db.time,this.db.population, this.db.capacity, this.db.diplomacy, this.db.value, async() => {
+            await Promise.all(Object.entries(data).map(([key, val]) => {
+                return this.db[key].bulkPut(val);
+            }));
+        }).then(()=> this.update());
+        
+    };
     //Creates Statistic page for goods and computes total value of goods for default page
     async createStatGoods() {
         let container = document.getElementById("stat-goods");
@@ -247,24 +304,25 @@ export class Database {
             container.appendChild(document.createElement("hr"))
         };
         let valueGoods = 0;
-        for (let i=0;i<this.assets.length;i++) {
+        let goods = await this.getAllGoods();
+
+        for (let good of Object.values(goods)) {
             let cell1 = document.createElement("div"), 
-                cell2 = document.createElement("div"), 
-                cell3 = document.createElement("div"),
-                cell4 = document.createElement("div"),
-                cell5 = document.createElement("div");
-            let aux = await this.db.goods.get(this.assets[i])
-            valueGoods+=aux.total*aux.valPU
+            cell2 = document.createElement("div"), 
+            cell3 = document.createElement("div"),
+            cell4 = document.createElement("div"),
+            cell5 = document.createElement("div");
+            valueGoods+=good.total*good.valPU
             cell1.className = "cell" 
-            cell1.innerHTML = aux.name
+            cell1.innerHTML = good.name
             cell2.className = "cell" 
-            cell2.innerHTML = aux.total.toFixed(2)
+            cell2.innerHTML = good.total.toFixed(2)
             cell3.className = "cell" 
-            cell3.innerHTML = aux.valPU
+            cell3.innerHTML = good.valPU
             cell4.className = "cell" 
-            cell4.innerHTML = (aux.total*aux.valPU).toFixed(2)
+            cell4.innerHTML = (good.total*good.valPU).toFixed(2)
             cell5.className = "cell"
-            cell5.innerHTML = aux.income
+            cell5.innerHTML = good.income
 
             container.appendChild(cell1)
             container.appendChild(cell2)
@@ -309,15 +367,15 @@ export class Database {
             container.appendChild(document.createElement("hr"))
         };
         let valueBuildings = 0;
-        for (let i=0;i<this.infstr.length;i++) {
+        let builds = await this.getAllBuildings();
+        for (let build of builds ) {
             let cell1 = document.createElement("div"), 
                 cell2 = document.createElement("div"), 
                 cell3 = document.createElement("div"),
                 cell5 = document.createElement("div"),
                 btn = document.createElement("button");
-            let aux = await this.db.buildings.get(this.infstr[i])
+            let aux = build
             valueBuildings += aux.value*aux.number
-            //console.log(aux,valueBuildings)
             cell1.className = "cell" 
             cell1.innerHTML = aux.name
             cell2.className = "cell" 
@@ -377,17 +435,16 @@ export class Database {
     computeWeeklyYield() {
         return this.db.transaction("rw",this.db.population,this.db.goods,this.db.buildings, async()=>{
             let incomes = {},
-                goods = {},
                 number = {};
-            (await this.db.buildings.bulkGet(this.infstr)).forEach((building, j) => {incomes[this.infstr[j]] = building.yield_weekly, number[this.infstr[j]]=building.number});
-            (await this.db.goods.bulkGet(this.assets)).forEach((res,k)=> {goods[this.assets[k]] = res});
-            
+            (await this.getAllBuildings()).forEach(building => {incomes[building.name] = building.yield_weekly, number[building.name]=building.number});
+            let goods = await this.getAllGoods();
+
             const pops = await this.db.population.get("Population");
             let cons = 8*(pops.adult+0.5*pops.infant);
             let goods_aux = {...goods};
             
-            Object.keys(goods_aux).forEach(resource => goods_aux[resource].income = 0);
-            Object.keys(incomes).forEach(building => {Object.keys(incomes[building]).forEach((resource,i) => { goods_aux[resource].income += Object.values(incomes[building])[i]*number[building];})});
+            Object.keys(goods_aux).forEach(resource => {goods_aux[resource].income = 0});
+            Object.keys(incomes).forEach(building => {Object.keys(incomes[building]).forEach((resource,i) => {goods_aux[resource].income += Object.values(incomes[building])[i]*number[building];})});
             
             //Managing food consumption
             cons -= goods_aux["Spiritual Food"].income
@@ -410,27 +467,21 @@ export class Database {
                 auxYield = {"food":0,"resources":0,"housings":0},
                 aux_stor = await this.db.capacity.get("Capacity"),
                 aux_pop = await this.db.population.get("Population");
-            (await this.db.buildings.bulkGet(this.infstr)).forEach((building, j) => {incomes[this.infstr[j]] = building.yield_const, number[this.infstr[j]]=building.number});
-            //console.log(incomes,number);
+            (await this.getAllBuildings()).forEach(building => {incomes[building.name] = building.yield_const, number[building.name]=building.number});
             Object.keys(incomes).forEach( building =>{
                 if (incomes[building].Housings != undefined) {
-                    //console.log(building,incomes[building],number[building],incomes[building].Housings); 
                     auxYield.housings+=incomes[building].Housings*number[building]
                 }
                 if (incomes[building].StorFood != undefined) {
-                    //console.log(building,incomes[building],number[building],incomes[building].StorFood);
                     auxYield.food+=incomes[building].StorFood*number[building]
                 }
                 if (incomes[building].StorRes != undefined) {
-                    //console.log(building,incomes[building],number[building],incomes[building].StorRes); 
                     auxYield.resources+=incomes[building].StorRes*number[building]
                 }
             })
-            //console.log("After:",auxYield)
             aux_stor.food = auxYield.food;
             aux_stor.resources = auxYield.resources;
             aux_pop.housings = auxYield.housings;
-            //console.log("Check",aux_stor,aux_pop)
             await this.db.capacity.put(aux_stor)
             await this.db.population.put(aux_pop)
         }).catch(err => {
@@ -445,17 +496,14 @@ export class Database {
                 requiredGoods = Object.keys(building.cost),
                 goods = {};
             (await this.db.goods.bulkGet(requiredGoods)).forEach((resource, i) => goods[requiredGoods[i]] = resource)
-            //console.log(goods)
             const buildable = requiredGoods.every(resourceName => goods[resourceName].total >= building.cost[resourceName])
             if(!buildable) {
                 return
             }
             requiredGoods.forEach(resourceName => goods[resourceName].total -= building.cost[resourceName])
-            //console.log("Updated Goods:", Object.values(goods))
             await this.db.goods.bulkPut(Object.values(goods))
             building.number += number
             await this.db.buildings.put(building)
-            //console.log("built " + number +" more of this", building)
         }).then( () => { 
             this.update();
         }).catch(err => {
@@ -474,8 +522,7 @@ export class Database {
     async addGood (Name,addInc,addTot,valPU){
         this.db.transaction("rw",this.db.goods, async () => {
             let aux = await this.db.goods.get(Name);
-            if (this.assets.includes(Name)===false) {
-                this.assets.push(Name)
+            if (aux ===undefined) {
                 await this.db.goods.put({name: Name, income: addInc, total: addTot,valPU:valPU});
             }
             else{
@@ -487,8 +534,10 @@ export class Database {
 
     //Gives information about all goods - mainly for debugging purposes
     async getAllGoods () {
-        let aux = await this.db.goods.bulkGet(this.assets);
-        return aux;
+        let aux = await this.db.goods.toArray(),
+            goods = {};
+        aux.forEach((res)=> {goods[res.name] = res});
+        return goods;
     };
 
     //Gives information about a specific good - mainly for debugging purposes
@@ -499,14 +548,12 @@ export class Database {
 
     //Gives information about all buildings - mainly for debugging purposes
     async getAllBuildings () {
-        let aux = await this.db.buildings.bulkGet(this.infstr);
-        return aux;
+        return await this.db.buildings.toArray();
     };
 
     //Gives information about a specific building - mainly for debugging purposes
     async getBuilding (Name) {
         let aux = await this.db.buildings.get(Name);
-        console.log(aux);
         return aux;
         }
 }
