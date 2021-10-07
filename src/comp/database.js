@@ -98,46 +98,46 @@ export class Database {
     async initSettings() {
         await this.createItemsAdd();
         let add = document.getElementById("AddingGoods"),
-            inputs = Array.from(add.querySelectorAll("input")),
+            inputsItems = Array.from(add.querySelectorAll("input")),
             btn = add.querySelector("button"),
             ops = document.getElementById("opt");
         let abort = false;
         await btn.addEventListener("click", async () => {
-            let inpValTot = inputs[1].value;
-            if(inputs[0].value.length === 0 || inputs[1].value.length === 0){
+            let inpValTot = inputsItems[1].value;
+            if(inputsItems[0].value.length === 0 || inputsItems[1].value.length === 0){
                 abort = true;
             }
             if (abort === false){
                 if (ops.selectedOptions[0].text==="Remove") {
                      inpValTot *= -1;
                 }
-                await this.addGood(inputs[0].value,0,inpValTot*1,inputs[2].value*1)
+                await this.addGood(inputsItems[0].value,0,inpValTot*1,inputsItems[2].value*1)
             }
         });
         await this.createBuildingsAdd();
+        let buildAdd = document.getElementById("AddingBuilds"),
+            inputsBuilds = Array.from(buildAdd.querySelectorAll("input")),
+            selectsBuilds = Array.from(buildAdd.querySelectorAll("select")),
+            btnBuild = buildAdd.querySelector("button");
+        
+        await btnBuild.addEventListener("click", async () => {
+                this.db.transaction("rw",this.db.buildings, async () => {
+                    this.db.buildings.put({name: inputsBuilds[0].value,cost:{}, number: 1,yield_weekly: {[selectsBuilds[1].value]: inputsBuilds[2].value},yield_const: {[selectsBuilds[0].value]: inputsBuilds[1].value}, value: 0,buildable: false})});
+        })
+        await this.createStatBuild();
     };
     async createBuildingsAdd () {
         let container = document.getElementById("settings");
         let head = document.createElement("h1"), Add = document.createElement("div");
         Add.id ="AddingBuilds";
-        head.innerHTML = "Add new buildings";
+        head.innerHTML = "Add new (unbuildable) sources of income";
         container.appendChild(head);
         let inpName = document.createElement("input");
-        let datalist = document.createElement("datalist");
         let builds = await this.getAllBuildings();
-        console.log(builds);
-        builds.forEach( building => {
-            let opt = document.createElement("option");
-            opt.value = building.name;
-            datalist.appendChild(opt);
-        })
-        datalist.id = "buildlist"
-        inpName.setAttribute('list', "buildlist");
         inpName.placeholder="Add name"
         inpName.type = "text"
         inpName.required = true
         inpName.id="inpName"
-        Add.appendChild(datalist);
         Add.appendChild(inpName);
 
 
@@ -151,7 +151,9 @@ export class Database {
         optionempty.selected ="selected";
         optionHous.innerText = "Housings";
         optionStorRes.innerText = "Storage Resources";
+        optionStorRes.value ="StorRes";
         optionStorFood.innerText = "Storage Food";
+        optionStorFood.value = "StorFood";
         optTotalYield.appendChild(optionempty);
         optTotalYield.appendChild(optionHous);
         optTotalYield.appendChild(optionStorRes);
@@ -174,7 +176,7 @@ export class Database {
         Object.keys(goods).forEach(name => {
             let optGood = document.createElement("option");
             optGood.innerText = name;
-            optGood.value = 1;
+            optGood.value = name;
             optWeeklyYield.appendChild(optGood);
         });
         optWeeklyYield.appendChild(optionemptyWeekly);
@@ -190,14 +192,14 @@ export class Database {
         let op = document.createElement("select"),
             option1 = document.createElement("option"),
             option2 = document.createElement("option");
-        option1.value = true;
-        option1.innerText = "Buildable";
-        op.appendChild(option1);
-        option2.value = false;
-        option2.innerText = "Not buildable";
+        option1.innerText = "Number fixed to 1"
+        option1.value = false
+        option2.innerText = "Number variable";
+        option2.value = true
         option2.selected = "selected";
+        op.appendChild(option1);
         op.appendChild(option2);
-        op.id ="optionsBuild";
+        op.id ="optionsVary";
         Add.appendChild(op)
 
         let btn = document.createElement("button");
@@ -212,7 +214,7 @@ export class Database {
         container.innerHTML="";
         let head = document.createElement("h1"), Add = document.createElement("div");
         Add.id = "AddingGoods"
-        head.innerHTML = "Add new items";
+        head.innerHTML = "Add additional existing or completely new items";
         container.appendChild(head);
 
         let inpName = document.createElement("input");
@@ -352,6 +354,7 @@ export class Database {
         URL.revokeObjectURL(a.href);
     };
 
+    //Loads databases via uploaded file
     loadDB(file) {
         const data = JSON.parse(file);
         this.db.transaction("rw",this.db.goods,this.db.buildings,this.db.time,this.db.population, this.db.capacity, this.db.diplomacy, this.db.value, async() => {
@@ -361,6 +364,7 @@ export class Database {
         }).then(()=> this.update());
         
     };
+
     //Creates Statistic page for goods and computes total value of goods for default page
     async createStatGoods() {
         let container = document.getElementById("stat-goods");
