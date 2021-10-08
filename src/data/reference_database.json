@@ -1,0 +1,313 @@
+{
+    "goods": [
+        {
+            "name": "Beef",
+            "income": 69,
+            "total": 700,
+            "valPU": 0.3
+        },
+        {
+            "name": "Bread",
+            "income": -102,
+            "total": 1250,
+            "valPU": 0.1
+        },
+        {
+            "name": "Fish",
+            "income": -7,
+            "total": 300,
+            "valPU": 0.2
+        },
+        {
+            "name": "Furniture",
+            "income": 0,
+            "total": 0,
+            "valPU": 6.5
+        },
+        {
+            "name": "GP",
+            "income": 4,
+            "total": 2658,
+            "valPU": 1
+        },
+        {
+            "name": "Glass",
+            "income": 0,
+            "total": 625,
+            "valPU": 4
+        },
+        {
+            "name": "Gold",
+            "income": 0,
+            "total": 5,
+            "valPU": 100
+        },
+        {
+            "name": "Grapes",
+            "income": 0,
+            "total": 40,
+            "valPU": 2.5
+        },
+        {
+            "name": "Marble",
+            "income": 0,
+            "total": 220,
+            "valPU": 10
+        },
+        {
+            "name": "Pottery",
+            "income": 0,
+            "total": 60,
+            "valPU": 2
+        },
+        {
+            "name": "Silver",
+            "income": 2.56,
+            "total": 12,
+            "valPU": 50
+        },
+        {
+            "name": "Spiritual Food",
+            "income": 240,
+            "total": 0,
+            "valPU": 0
+        },
+        {
+            "name": "Stone",
+            "income": 0,
+            "total": 25,
+            "valPU": 3
+        },
+        {
+            "name": "Wheat",
+            "income": 0,
+            "total": 0,
+            "valPU": 0.1
+        },
+        {
+            "name": "Wood",
+            "income": 0,
+            "total": 5475,
+            "valPU": 1.5
+        }
+    ],
+    "buildings": [
+        {
+            "name": "Carpentry",
+            "cost": {
+                "Wood": 150,
+                "Stone": 100,
+                "GP": 550
+            },
+            "number": 0,
+            "yield_weekly": {
+                "Wood": -4,
+                "Furniture": 4
+            },
+            "yield_const": {},
+            "value": 1075,
+            "buildable": true,
+            "variable": false
+        },
+        {
+            "name": "Chapel - Lancellin",
+            "cost": {
+                "GP": 600
+            },
+            "number": 1,
+            "yield_weekly": {
+                "Spiritual Food": 240
+            },
+            "yield_const": {},
+            "value": 600,
+            "buildable": false,
+            "variable": false
+        },
+        {
+            "name": "Farm",
+            "cost": {
+                "Wood": 500,
+                "Stone": 200,
+                "GP": 1900
+            },
+            "number": 4,
+            "yield_weekly": {
+                "Beef": 80,
+                "Wheat": 100
+            },
+            "yield_const": {
+                "Housings": 4
+            },
+            "value": 3250,
+            "buildable": true,
+            "variable": false
+        },
+        {
+            "name": "Fiddler's Green",
+            "cost": {
+                "Wood": 125,
+                "Stone": 75,
+                "GP": 800
+            },
+            "number": 1,
+            "yield_weekly": {},
+            "yield_const": {},
+            "value": 1212.5,
+            "buildable": true,
+            "variable": false
+        },
+        {
+            "name": "Fishing Hut",
+            "cost": {
+                "Wood": 50,
+                "Stone": 20,
+                "GP": 140
+            },
+            "number": 3,
+            "yield_weekly": {
+                "Fish": 48
+            },
+            "yield_const": {},
+            "value": 275,
+            "buildable": true,
+            "variable": false
+        },
+        {
+            "name": "Fishing Village - Paris",
+            "cost": {},
+            "number": 1,
+            "yield_weekly": {
+                "Fish": 100
+            },
+            "yield_const": {},
+            "value": 0,
+            "buildable": false,
+            "variable": false
+        },
+        {
+            "name": "Gristmill",
+            "cost": {
+                "Wood": 100,
+                "Stone": 75,
+                "GP": 300
+            },
+            "number": 2,
+            "yield_weekly": {
+                "Wheat": -200,
+                "Bread": 200,
+                "GP": 2
+            },
+            "yield_const": {},
+            "value": 675,
+            "buildable": true,
+            "variable": false
+        },
+        {
+            "name": "House",
+            "cost": {
+                "Wood": 150,
+                "Stone": 100,
+                "GP": 475
+            },
+            "number": 19,
+            "yield_weekly": {},
+            "yield_const": {
+                "Housings": 8
+            },
+            "value": 1000,
+            "buildable": true,
+            "variable": false
+        },
+        {
+            "name": "Inn",
+            "cost": {
+                "GP": 800
+            },
+            "number": 1,
+            "yield_weekly": {},
+            "yield_const": {},
+            "value": 800,
+            "buildable": false,
+            "variable": false
+        },
+        {
+            "name": "Silver Mine - skilled Workers",
+            "cost": {},
+            "number": 4,
+            "yield_weekly": {
+                "Silver": 0.4
+            },
+            "yield_const": {},
+            "value": 0,
+            "buildable": false,
+            "variable": true
+        },
+        {
+            "name": "Silver Mine - unskilled Workers",
+            "cost": {},
+            "number": 15,
+            "yield_weekly": {
+                "Silver": 0.064
+            },
+            "yield_const": {},
+            "value": 0,
+            "buildable": false,
+            "variable": true
+        },
+        {
+            "name": "Storehouse",
+            "cost": {
+                "Wood": 450,
+                "Stone": 300,
+                "GP": 925
+            },
+            "number": 1,
+            "yield_weekly": {},
+            "yield_const": {
+                "StorRes": 15000,
+                "StorFood": 30000
+            },
+            "value": 2500,
+            "buildable": true,
+            "variable": false
+        }
+    ],
+    "time": [
+        {
+            "name": "Time",
+            "year": 1132,
+            "week": 30
+        }
+    ],
+    "population": [
+        {
+            "name": "Population",
+            "total": 167,
+            "adult": 144,
+            "infant": 23,
+            "housings": 168
+        }
+    ],
+    "capacity": [
+        {
+            "name": "Capacity",
+            "resources": 15000,
+            "food": 30000
+        }
+    ],
+    "diplomacy": [
+        {
+            "name": "Diplomacy",
+            "fame": 2,
+            "arcane": 1
+        }
+    ],
+    "value": [
+        {
+            "name": "Value",
+            "total": 56648,
+            "resources": 17360.5,
+            "buildings": 39287.5
+        }
+    ]
+}

@@ -1,3 +1,51 @@
-body {
+table {
+    border-collapse: separate;
+    border-spacing: 0em 0px;
+    color: white
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: auto auto auto auto auto; 
+    grid-row-gap: 5px;
+    color: white;
+  }
+.row5 > :where(*:nth-child(10n + 6),
+                *:nth-child(10n + 7),
+                *:nth-child(10n + 8),
+                *:nth-child(10n + 9),
+                *:nth-child(10n + 10)) {
+    background: linear-gradient(to right,var(--blue) 25%,var(--bright-blue) 60%,var(--blue) 85%);
+    color: var(--dark-blue);
+}
+#stat-tot {
+    grid-template-columns: auto auto;
+    margin: 5vh;
+}
+
+#settings {
+    color: white;
+    display: grid;
+    grid-template-columns: auto;
+}
+#load {
+    display: none;
+}
+.hr {
+    width: 300%;
+    border-style: solid;
+    margin-left: auto;
+    margin-right: auto;
+}
+#loadfirst {
     text-align: center;
+    color: white;
+}
+.buildable:hover {
+    background: rgb(20, 192, 20);
+    color: black;
+}
+.nonbuildable:hover {
+    background: rgb(228, 54, 54);
+    color: black;
 }
