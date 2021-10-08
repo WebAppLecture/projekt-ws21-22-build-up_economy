@@ -13,21 +13,4 @@ export class Skin {
             this.target.setAttribute("href", this.path + name + "/" + name + ".css");
         }
     }
-
-    get activeSkin() {
-        return this._activeSkin;
-    }
-
-    next() {
-        let index = this.skins.indexOf(this._activeSkin) + 1;
-        index = index >= this.skins.length ? 0 : index;
-        this.activeSkin = this.skins[index];
-    }
-
-    previous() {
-        let index = this.skins.indexOf(this._activeSkin) - 1;
-        index = index < 0 ? this.skins.length - 1 : index;
-        this.activeSkin = this.skins[index];
-    }
-
 }

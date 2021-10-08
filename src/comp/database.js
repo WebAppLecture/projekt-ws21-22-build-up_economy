@@ -31,13 +31,7 @@ export class Database {
                 this.update();
             }
         })
-        //this.update();
     };
-
-    async sleep(milliseconds) {
-        return new Promise(resolve => setTimeout(resolve, milliseconds));
-    };
-
 
     //Initializes the Database with certain values - will be replaced by external .json
     async initDatabase() {
