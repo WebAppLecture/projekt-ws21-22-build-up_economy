@@ -1,9 +1,6 @@
 @import url("./game-box.css");
 @import url("./controls.css");
 
-:root {
-    --accent-content: "Assignan - prev";
-}
 
 table {
     border-collapse: separate;
@@ -13,9 +10,17 @@ table {
 .grid {
     display: grid;
     grid-template-columns: auto auto auto auto auto; 
-    grid-gap: 10px;
+    grid-row-gap: 5px;
     color: white;
   }
+.row5 > :where(*:nth-child(10n + 6),
+                *:nth-child(10n + 7),
+                *:nth-child(10n + 8),
+                *:nth-child(10n + 9),
+                *:nth-child(10n + 10)) {
+    background: linear-gradient(to right,var(--gold) 25%,var(--bright-gold) 60%,var(--gold) 85%);
+    color: var(--dark-gold);
+}
 #stat-tot {
     grid-template-columns: auto auto;
 }
@@ -36,4 +41,12 @@ table {
 #loadfirst {
     text-align: center;
     color: white;
+}
+.buildable {
+    background: rgb(20, 192, 20);
+    color: black;
+}
+.nonbuildable {
+    background: rgb(228, 54, 54);
+    color: black;
 }

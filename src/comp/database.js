@@ -85,6 +85,10 @@ export class Database {
                 let loadtxt = document.querySelector("#loadfirst");
                 loadtxt.className ="hidden";
             }});
+        let root = document.documentElement;
+        let time_aux = await this.db.time.get("Time");
+        let str = "'"+"Assignan " + time_aux.week +"/"+time_aux.year + " p.F."+"'";
+        root.style.setProperty('--accent-content',str);
         await this.createStatGoods();
         await this.createStatBuild();
         await this.computeWeeklyYield();
@@ -298,9 +302,6 @@ export class Database {
     async weekPassed() {
         let time = await this.timeManager();
         this.weekPassedComputations();
-        let acc = document.querySelector(".accent");
-        console.log(acc.style,time);
-        acc.style.setProperty('--accent-content',"Assignan - after");
         this.update();
     };
 
@@ -319,14 +320,12 @@ export class Database {
         container.appendChild(head)
         container.appendChild(cell1)
         
-        let time = document.createElement("div"), 
-                pop = document.createElement("div"), 
+        let     pop = document.createElement("div"), 
                 cap = document.createElement("div"),
                 dipl = document.createElement("div"),
                 val = document.createElement("div");
 
         let pop_aux  = await this.db.population.get("Population"),
-            time_aux = await this.db.time.get("Time"),
             cap_aux  = await this.db.capacity.get("Capacity"),
             dipl_aux = await this.db.diplomacy.get("Diplomacy"),
             val_aux  = await this.db.value.get("Value");
@@ -335,7 +334,6 @@ export class Database {
         await this.db.value.put(val_aux);
 
         let pop_txt =""; for (let x in pop_aux) {pop_txt += x+": "+pop_aux[x] +" "}; pop.innerHTML = pop_txt.replace("name:",""); container.appendChild(pop);
-        let time_txt =""; for (let x in time_aux) {time_txt += x+": "+time_aux[x] +" "}; time.innerHTML = time_txt.replace("name:",""); container.appendChild(time);
         let cap_txt =""; for (let x in cap_aux) {cap_txt += x+": "+cap_aux[x] +" "}; cap.innerHTML = cap_txt.replace("name:",""); container.appendChild(cap);
         let dipl_txt =""; for (let x in dipl_aux) {dipl_txt += x+": "+dipl_aux[x] +" "}; dipl.innerHTML = dipl_txt.replace("name:",""); container.appendChild(dipl);
         let val_txt =""; for (let x in val_aux) {val_txt += x+": "+val_aux[x] +" "}; val.innerHTML = val_txt.replace("name:",""); container.appendChild(val);
@@ -367,6 +365,13 @@ export class Database {
     loadDB(file) {
         const data = JSON.parse(file);
         this.db.transaction("rw",this.db.goods,this.db.buildings,this.db.time,this.db.population, this.db.capacity, this.db.diplomacy, this.db.value, async() => {
+            await this.db.goods.clear();
+            await this.db.buildings.clear();
+            await this.db.time.clear();
+            await this.db.population.clear();
+            await this.db.capacity.clear();
+            await this.db.diplomacy.clear();
+            await this.db.value.clear();
             await Promise.all(Object.entries(data).map(([key, val]) => {
                 return this.db[key].bulkPut(val);
             }));
@@ -469,6 +474,7 @@ export class Database {
         };
         let valueBuildings = 0;
         let builds = await this.getAllBuildings();
+        let goods = await this.getAllGoods();
         for (let build of builds ) {
             let cell1 = document.createElement("div"), 
                 cell2 = document.createElement("div"), 
@@ -534,8 +540,29 @@ export class Database {
             if (aux.buildable === true) {
                 btn.innerHTML   = "Build"
                 btn.id          = "btn-build-"+aux.name
-                btn.className   = "build"
+                const buildable = Object.keys(aux.cost).every(resName => goods[resName].total >= aux.cost[resName]);
+                btn.className = buildable ? "build buildable" : "build nonbuildable";
                 btn.addEventListener("click", ()=>this.buildBuilding(aux.name,1))
+
+                /*btn.addEventListener("mouseenter", async () => {
+                    const buildable = await this.db.transaction("rw",this.db.goods,this.db.buildings, async()=>{
+                        const building = await this.db.buildings.get(aux.name),
+                            requiredGoods = Object.keys(building.cost),
+                            goods = {};
+                        (await this.db.goods.bulkGet(requiredGoods)).forEach((resource, i) => goods[requiredGoods[i]] = resource)
+                        const buildable = requiredGoods.every(resourceName => goods[resourceName].total >= building.cost[resourceName])
+                        return buildable
+                    });
+                    if(!buildable) {
+                        btn.style = 
+                        btn.className = "build nonbuildable";
+                        console.log("nonbuildable")
+                    }
+                    else {
+                        btn.className = "build buildable"
+                    };
+                });
+                btn.addEventListener("mouseleave", () => btn.className = "build");*/
                 container.appendChild(btn)
             }
             else{
