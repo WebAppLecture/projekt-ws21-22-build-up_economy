@@ -333,10 +333,10 @@ export class Database {
         val_aux.total = val_aux.buildings + val_aux.resources
         await this.db.value.put(val_aux);
 
-        pop.style = "white-space: pre"; pop.innerHTML="\t🏘\t-\t"+pop_aux.housings+"\t\t👪\t-\t"+pop_aux.total+"\n\t🧑\t-\t"+pop_aux.adult+"\t\t🧒\t-\t"+pop_aux.infant;container.appendChild(pop);
-        let cap_txt =""; for (let x in cap_aux) {cap_txt += x+": "+cap_aux[x] +" "}; cap.innerHTML = cap_txt.replace("name:",""); container.appendChild(cap);
+        pop.style = "white-space: pre"; pop.innerHTML="\t🏘\t-\t"+pop_aux.housings+"\t\t\t\t👪\t-\t"+pop_aux.total+"\n\t🧑\t-\t"+pop_aux.adult+"  \t\t\t🧒\t-\t"+pop_aux.infant;container.appendChild(pop);
+        let cap_txt =""; cap.style = "white-space: pre"; for (let x in cap_aux) {cap_txt += x+":"+cap_aux[x] +""}; cap.innerHTML = cap_txt.replace("name:","").replace("food:","\n\t\t\t&#127828;\t").replace("resources:","\t\t&#129717;\t"); container.appendChild(cap);
         dipl.style = "white-space: pre"; dipl.innerHTML="\t☆\t-\t"+dipl_aux.fame+"\n\t🗲\t-\t"+dipl_aux.arcane; container.appendChild(dipl);
-        let val_txt =""; for (let x in val_aux) {val_txt += x+": "+val_aux[x] +" "}; val.innerHTML = val_txt.replace("name:",""); container.appendChild(val);
+        let val_txt ="\&#129689; \tin \t"; val.style = "white-space: pre"; for (let x in val_aux) {val_txt += x+":\t"+val_aux[x] +" "}; val.innerHTML = val_txt.replace("name:\tValue","").replace("resources","\n\tin\t&#127828;&#129717").replace("buildings","\n\tin\t&#127968;&#127970;"); container.appendChild(val);
 
         
         };
