@@ -1,61 +1,15 @@
 .controls > *,
 .stat-change > div {
-    background-color: var(--gold);
-    background: linear-gradient(to right,var(--gold) 25%,var(--bright-gold) 60%,var(--gold) 85%); 
+    background-color: var(--blue);
+    background: linear-gradient(to right,var(--blue) 25%,var(--bright-blue) 60%,var(--blue) 85%); 
 
-    color: var(--dark-gold);
+    color: var(--dark-blue);
     text-align: center;
     font-family: monospace;
     font-weight: 900;
 
     box-shadow: 0 0 .6vh 0 black,
-    -.5vh 0 .8vh 0 var(--bright-gold) inset;
-}
-
-.d-pad {
-    margin-top: 6vh;
-
-    border-top-left-radius: 3.5vh;
-    border-top-right-radius: 3.5vh;
-    border-bottom-right-radius: 5vh 100%;
-    border-bottom-left-radius: 5vh 100%;
-
-    transform-origin: 50% 40%;
-
-    line-height: 9.5vh;
-    font-family: 'Times New Roman', Times, serif;
-    font-size: 10vh;
-}
-
-.up {
-    box-shadow: 0 0 .6vh 0 black,
-        1vh 1vh .5vh .1vh inset var(--bright-gold-trans), 
-        0 0 0 .8vh inset var(--dark-gold-trans);
-}
-
-.right {
-    box-shadow: 0 0 .6vh 0 black,
-    1vh -1vh .5vh .1vh inset var(--bright-gold-trans), 
-    0 0 0 .8vh inset var(--dark-gold-trans);
-}
-
-.down {
-    box-shadow: 0 0 .6vh 0 black,
-        -1vh -1vh .5vh .1vh inset var(--bright-gold-trans), 
-        0 0 0 .8vh inset var(--dark-gold-trans);
-}
-
-.left {
-    box-shadow: 0 0 .6vh 0 black,
-        -1vh 1vh .5vh .1vh inset var(--bright-gold-trans), 
-        0 0 0 .8vh inset var(--dark-gold-trans);
-}
-
-.d-pad:active,
-.d-pad:focus {
-    box-shadow: 0 0 .6vh 0 black,
-    0 0 0 .9vh inset var(--dark-gold-trans);
-    font-size: 9.5vh;
+    -.5vh 0 .8vh 0 var(--bright-blue) inset;
 }
 
 .big-button {
@@ -126,10 +80,10 @@
 }
 
 .reset {
-    border-top: .5vh solid var(--gold);
-    border-right: .5vh solid var(--dark-gold);
-    border-bottom: .5vh solid var(--gold);
-    border-left: .5vh solid var(--bright-gold);
+    border-top: .5vh solid var(--blue);
+    border-right: .5vh solid var(--dark-blue);
+    border-bottom: .5vh solid var(--blue);
+    border-left: .5vh solid var(--bright-blue);
  
     font-size: 2.3vh;
 }
@@ -142,10 +96,10 @@
     width: 4vh;
     margin-right: 1vh;
 
-    border-top: .5vh solid var(--gold);
-    border-right: .5vh solid var(--dark-gold);
-    border-bottom: .5vh solid var(--gold);
-    border-left: .5vh solid var(--bright-gold);
+    border-top: .5vh solid var(--blue);
+    border-right: .5vh solid var(--dark-blue);
+    border-bottom: .5vh solid var(--blue);
+    border-left: .5vh solid var(--bright-blue);
 
     text-align: center;
     font-size: 1.8vh;
@@ -154,8 +108,8 @@
 
 .reset:active,
 .stat-change > div:active {
-    border-top: .5vh solid var(--dark-gold);
-    border-right: .5vh solid var(--darkest-gold);
-    border-bottom: .5vh solid var(--dark-gold);
-    border-left: .5vh solid var(--gold);
+    border-top: .5vh solid var(--dark-blue);
+    border-right: .5vh solid var(--darkest-blue);
+    border-bottom: .5vh solid var(--dark-blue);
+    border-left: .5vh solid var(--blue);
 }

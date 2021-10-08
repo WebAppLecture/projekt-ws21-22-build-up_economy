@@ -11,7 +11,8 @@ export class Database {
               value: 'name,total,resources,buildings'
           });
 
-
+        //Takes care of the possibility to load databases in case of missing data
+        
         let btn_save = document.querySelector("button#save"),
             inp_load = document.querySelector("input#load");
 
@@ -23,9 +24,12 @@ export class Database {
                 reader.addEventListener("load", (ev) => this.loadDB(ev.target.result));
                 reader.readAsText(e.target.files[0]);
             });
-
+        //If there is no other possibility, one can recreate the village by uncommenting this command:
         //this.initDatabase();
+
+        //Initializes the Settings button (which wont run without data!)
         this.initSettings();
+        //If there is data available, the "json needed" message is cleared
         this.getAllGoods().then((goods)=>{
             if (Object.keys(goods).length > 0) {
                 this.update();
@@ -33,7 +37,7 @@ export class Database {
         })
     };
 
-    //Initializes the Database with certain values - will be replaced by external .json
+    //Initializes the Database with certain values - shouldnt be used anymore, since data is loaded via external json
     async initDatabase() {
         this.assets = ["Wood","Stone","Silver","Marble","Glass","Gold","Grapes","Pottery","Furniture","Bread","Wheat","Beef","Fish","Spiritual Food","GP"];
         this.asset_num = [5475,25,12,220,625,5,40,60,0,1250,0,700,300,0,2658];
@@ -70,7 +74,7 @@ export class Database {
         
         await this.db.diplomacy.put({name:"Diplomacy",fame: 2,arcane:1});
         await this.db.value.put({name:"Value",total: 0,resources:0,buildings:0});
-    }
+    };
 
     //Is called when important things happen and an update is necessary
     async update(){
@@ -211,6 +215,7 @@ export class Database {
 
         container.appendChild(Add);
     };
+
     //Create necessary HTML in settings page
     async createItemsAdd() {
         let container = document.getElementById("settings");
@@ -379,118 +384,66 @@ export class Database {
     async createStatGoods() {
         let container = document.getElementById("stat-goods");
         container.innerHTML="";
-        let cell1 = document.createElement("div"), 
-                cell2 = document.createElement("div"), 
-                cell3 = document.createElement("div"),
-                cell4 = document.createElement("div"),
-                cell5 = document.createElement("div");
-        cell1.className = "cell" 
-        cell1.innerHTML = "Goods"
-        cell2.className = "cell" 
-        cell2.innerHTML = "Total Number"
-        cell5.innerHTML = "Income per Week"
-        cell5.className = "cell"
-        cell3.className = "cell" 
-        cell3.innerHTML = "Value per Unit in GP"
-        cell4.className = "cell" 
-        cell4.innerHTML = "Total value of this asset"
 
+        //Create header of table "goods" by subfunction
+        this.createCells(container, ["Goods", "Total Number", "Income per Week", "Value per Unit in GP", "Total value of this asset"]);
+        this.createLine(container,5);
 
-
-        container.appendChild(cell1)
-        container.appendChild(cell2)
-        container.appendChild(cell5)
-        container.appendChild(cell3)
-        container.appendChild(cell4)
-        for (let i=1;i<=5;i++){
-            container.appendChild(document.createElement("hr"))
-        };
+        //Fill the table with values from database
         let valueGoods = 0;
         let goods = await this.getAllGoods();
-
         for (let good of Object.values(goods)) {
-            let cell1 = document.createElement("div"), 
-            cell2 = document.createElement("div"), 
-            cell3 = document.createElement("div"),
-            cell4 = document.createElement("div"),
-            cell5 = document.createElement("div");
-            valueGoods+=good.total*good.valPU
-            cell1.className = "cell" 
-            cell1.innerHTML = good.name
-            cell2.className = "cell" 
-            cell2.innerHTML = good.total.toFixed(2)
-            cell3.className = "cell" 
-            cell3.innerHTML = good.valPU
-            cell4.className = "cell" 
-            cell4.innerHTML = (good.total*good.valPU).toFixed(2)
-            cell5.className = "cell"
-            cell5.innerHTML = good.income.toFixed(2);
-
-            container.appendChild(cell1)
-            container.appendChild(cell2)
-            container.appendChild(cell5)
-            container.appendChild(cell3)
-            container.appendChild(cell4)
-
-            }
+            this.createCells(container,[good.name,good.total.toFixed(2),good.income.toFixed(2),good.valPU,(good.total*good.valPU).toFixed(2)])
+        };
         let aux_val = await this.db.value.get("Value");
         aux_val.resources = valueGoods;
         await this.db.value.put(aux_val)
+    };
+
+    //Extract the cell creation in the tables
+    createCells(cont,list) {
+        for (let i =0; i<list.length;i++) {
+            let cell = document.createElement("div");
+            cell.className = "cell";
+            cell.innerHTML = list[i];
+            cont.appendChild(cell);
+        };
+    };
+
+    //Extract empty line creation
+    createLine(cont,numb){
+        for (let i=0;i<numb;i++){
+            let hr = document.createElement("hr");
+            hr.style = "color: transparent";
+            cont.appendChild(hr);
+        };
     };
 
     //Creates the statisticspage for buildings and computes their total value
     async createStatBuild() {
         let container = document.getElementById("build");
         container.innerHTML="";
-        let cell1 = document.createElement("div"), 
-            cell2 = document.createElement("div"), 
-            cell3 = document.createElement("div"),
-            cell4 = document.createElement("div"),
-            cell5 = document.createElement("div");
-        cell1.className = "cell" 
-        cell1.innerHTML = "Building"
-        cell2.className = "cell" 
-        cell2.innerHTML = "Cost"
-        cell3.className = "cell" 
-        cell3.innerHTML = "Number"
-        cell4.className = "cell"
-        cell4.innerHTML = "Build"
-        cell5.className = "cell"
-        cell5.innerHTML = "Yield"
+        
+        this.createCells(container, ["Building","Cost","Number","Yield","Build"]);
+        this.createLine(container,5);
 
-        container.appendChild(cell1)
-        container.appendChild(cell2)
-        container.appendChild(cell3)
-        container.appendChild(cell5)
-        container.appendChild(cell4)
-        
-        
-        for (let i=1;i<=5;i++){
-            container.appendChild(document.createElement("hr"))
-        };
         let valueBuildings = 0;
         let builds = await this.getAllBuildings();
         let goods = await this.getAllGoods();
         for (let build of builds ) {
-            let cell1 = document.createElement("div"), 
-                cell2 = document.createElement("div"), 
-                cell3 = document.createElement("div"),
+            let cell3 = document.createElement("div"),
                 cell5 = document.createElement("div"),
                 btn = document.createElement("button"),
                 slct = document.createElement("select");
             let aux = build
             valueBuildings += aux.value*aux.number
-            cell1.className = "cell" 
-            cell1.innerHTML = aux.name
-            cell2.className = "cell" 
+             
             let txt_cost ="";
             for (let x in aux.cost) {
                 txt_cost += x+": "+aux.cost[x] +" ";
             };
-            cell2.innerHTML = txt_cost
-            container.appendChild(cell1)
-            container.appendChild(cell2)
-
+            this.createCells(container,[aux.name,txt_cost]);
+            
             if (aux.variable) {
                 for (let i = 0;i<=100;i++) {
                     let opt = document.createElement("option");
@@ -512,24 +465,11 @@ export class Database {
                 container.appendChild(cell3)
             };
 
-            
             cell5.className = "cell"
             let txt_yield = "";
-            if (Object.keys(aux.yield_weekly) != 0) {
-                let txt_yield_weekly ="";
-                for (let x in aux.yield_weekly) {
-                    txt_yield_weekly += x+": "+aux.yield_weekly[x] +" ";
-                };
-                txt_yield += "Weekly: "+txt_yield_weekly
-            };
-            if (Object.keys(aux.yield_const) != 0) {
-                let txt_yield_const ="";
-                for (let x in aux.yield_const) {
-                    txt_yield_const += x+": "+aux.yield_const[x] +" ";
-                };
-                txt_yield += "Const: "+txt_yield_const
-            };
-            
+            //Create strings in subfunctions
+            txt_yield += this.iterateYields(aux.yield_weekly,"Weekly: ");
+            txt_yield += this.iterateYields(aux.yield_const,"Const: ");
             cell5.innerHTML = txt_yield
             container.appendChild(cell5)
 
@@ -545,14 +485,25 @@ export class Database {
                 let btncell = document.createElement("div");
                 btncell.innerHTML="";
                 container.appendChild(btncell);
-            }
-
-            
-
-            }
+            };
+            };
         let aux_val = await this.db.value.get("Value");
         aux_val.buildings = valueBuildings;
         await this.db.value.put(aux_val)
+    };
+
+    //Subfunction to shorten createStatBuild function
+    iterateYields(obj,str) {
+        if (Object.keys(obj) != 0) {
+            let txt ="";
+            for (let x in obj) {
+                txt += x+": "+obj[x] +" ";
+            };
+            return str+txt
+        }
+        else {
+            return ""
+        };
     };
 
     //Computes the yield per week writes them into the goods database
@@ -593,21 +544,21 @@ export class Database {
                 aux_pop = await this.db.population.get("Population");
             (await this.getAllBuildings()).forEach(building => {incomes[building.name] = building.yield_const, number[building.name]=building.number});
             Object.keys(incomes).forEach( building =>{
-                if (incomes[building].Housings != undefined) {
-                    auxYield.housings+=incomes[building].Housings*number[building]
-                }
-                if (incomes[building].StorFood != undefined) {
-                    auxYield.food+=incomes[building].StorFood*number[building]
-                }
-                if (incomes[building].StorRes != undefined) {
-                    auxYield.resources+=incomes[building].StorRes*number[building]
-                }
-            })
+                let names = ["StorFood","StorRes","Housings"];
+                let m = 0;
+                for (let key of Object.keys(auxYield)) {
+                    if (incomes[building][names[m]] != undefined) {
+                        auxYield[key]+=incomes[building][names[m]]*number[building]
+                    };
+                    m++;
+                };
+            });
+            
             aux_stor.food = auxYield.food;
             aux_stor.resources = auxYield.resources;
+            await this.db.capacity.put(aux_stor);
             aux_pop.housings = auxYield.housings;
-            await this.db.capacity.put(aux_stor)
-            await this.db.population.put(aux_pop)
+            await this.db.population.put(aux_pop);
         }).catch(err => {
             console.error(err.stack);
         });

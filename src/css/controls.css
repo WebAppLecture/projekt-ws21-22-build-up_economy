@@ -3,28 +3,6 @@
     cursor: pointer;
 }
 
-.d-pad {
-    grid-area: dpad;
-    width: 7vh;
-    height: 9.5vh;
-}
-
-.up {
-    transform: rotate(10deg) translateY(-7vh);
-}
-
-.right {
-    transform: rotate(100deg) translateY(-7vh);
-}
-
-.down {
-    transform: rotate(190deg) translateY(-7vh);
-}
-
-.left {
-    transform: rotate(280deg) translateY(-7vh);
-}
-
 .big-button {   
     width: 7vh;
     height: 7vh;

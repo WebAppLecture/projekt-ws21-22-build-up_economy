@@ -1,23 +1,23 @@
 body {
-    background: radial-gradient(ellipse at center, var(--gold-glow) 50%,var(--shadow) 100%);
+    background: radial-gradient(ellipse at center, var(--blue-glow) 50%,var(--shadow) 100%);
 }
 
 .gameBox {
-    border-top: 3vh solid var(--gold);
-    border-right: 3vh solid var(--darkest-gold);
-    border-bottom: 3vh solid var(--gold);
-    border-left: 3vh solid var(--bright-gold);
+    border-top: 3vh solid var(--blue);
+    border-right: 3vh solid var(--darkest-blue);
+    border-bottom: 3vh solid var(--blue);
+    border-left: 3vh solid var(--bright-blue);
 
     border-radius: .3vh;
 
-    background: linear-gradient(to left, var(--bright-gold) -7%, var(--gold) 15%, var(--gold) 35%,var(--bright-gold) 60%,var(--gold) 75%, var(--dark-gold) 95%); 
+    background: linear-gradient(to left, var(--bright-blue) -7%, var(--blue) 15%, var(--blue) 35%,var(--bright-blue) 60%,var(--blue) 75%, var(--dark-blue) 95%); 
 
     box-shadow: 0 0 15vh -5vh yellow;
 }
 
 .logo{
-    background-color: var(--dark-gold);
-    background: linear-gradient(to top, var(--dark-gold), var(--shadow));
+    background-color: var(--dark-blue);
+    background: linear-gradient(to top, var(--dark-blue), var(--shadow));
 
     color: transparent;
     font-family: monospace;
@@ -68,10 +68,10 @@ body {
 }
 
 .screen {
-    border-top: 1vh solid var(--gold);
-    border-right: 1vh solid var(--bright-gold);
-    border-bottom: 1vh solid var(--gold);
-    border-left: 1vh solid var(--dark-gold);
+    border-top: 1vh solid var(--blue);
+    border-right: 1vh solid var(--bright-blue);
+    border-bottom: 1vh solid var(--blue);
+    border-left: 1vh solid var(--dark-blue);
 
     background-color: rgb(3, 19, 3);
     color: rgb(190, 16, 16);

@@ -1,11 +1,11 @@
 :root {
-    --bright-gold-trans: rgba(109, 218, 226, 0.6);
-    --dark-gold-trans: rgba(28, 51, 114, 0.6);
-    --darkest-gold: hsl(236, 73%, 16%);
-    --dark-gold: rgb(40, 61, 131);
-    --gold: rgb(122, 208, 230);
-    --bright-gold: rgb(255, 255, 255);
-    --gold-glow: rgb(42, 32, 129);
+    --bright-blue-trans: rgba(109, 218, 226, 0.6);
+    --dark-blue-trans: rgba(28, 51, 114, 0.6);
+    --darkest-blue: hsl(236, 73%, 16%);
+    --dark-blue: rgb(40, 61, 131);
+    --blue: rgb(122, 208, 230);
+    --bright-blue: rgb(255, 255, 255);
+    --blue-glow: rgb(42, 32, 129);
     --shadow: black;
     --accent-content: ". . .";
 }

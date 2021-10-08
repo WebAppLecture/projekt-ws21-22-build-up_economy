@@ -19,8 +19,8 @@ table {
                 *:nth-child(10n + 8),
                 *:nth-child(10n + 9),
                 *:nth-child(10n + 10)) {
-    background: linear-gradient(to right,var(--gold) 25%,var(--bright-gold) 60%,var(--gold) 85%);
-    color: var(--dark-gold);
+    background: linear-gradient(to right,var(--blue) 25%,var(--bright-blue) 60%,var(--blue) 85%);
+    color: var(--dark-blue);
 }
 #stat-tot {
     grid-template-columns: auto auto;
