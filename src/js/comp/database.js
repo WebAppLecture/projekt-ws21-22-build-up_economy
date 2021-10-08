@@ -393,7 +393,8 @@ export class Database {
         let valueGoods = 0;
         let goods = await this.getAllGoods();
         for (let good of Object.values(goods)) {
-            this.createCells(container,[good.name,good.total.toFixed(2),good.income.toFixed(2),good.valPU,(good.total*good.valPU).toFixed(2)])
+            valueGoods+=good.total*good.valPU;
+            this.createCells(container,[good.name,good.total.toFixed(2),good.income.toFixed(2),good.valPU,(good.total*good.valPU).toFixed(2)]);
         };
         let aux_val = await this.db.value.get("Value");
         aux_val.resources = valueGoods;
