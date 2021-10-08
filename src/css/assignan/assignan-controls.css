@@ -1,5 +1,5 @@
 .controls > *,
-.skin-change > div {
+.stat-change > div {
     background-color: var(--gold);
     background: linear-gradient(to right,var(--gold) 25%,var(--bright-gold) 60%,var(--gold) 85%); 
 
@@ -143,7 +143,7 @@
     font-size: 2vh;
 }
 
-.skin-change > div {
+.stat-change > div {
     width: 4vh;
     margin-right: 1vh;
 
@@ -159,7 +159,7 @@
 
 
 .reset:active,
-.skin-change > div:active {
+.stat-change > div:active {
     border-top: .5vh solid var(--dark-gold);
     border-right: .5vh solid var(--darkest-gold);
     border-bottom: .5vh solid var(--dark-gold);

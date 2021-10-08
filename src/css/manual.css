@@ -1,0 +1,11 @@
+body{
+    font-family: monospace;
+    color: white;
+    background-color: rgb(43, 42, 51);
+}
+a{
+    color:honeydew;
+}
+a:visited {
+    color:rgb(196, 196, 196);
+}

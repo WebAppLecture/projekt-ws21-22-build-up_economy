@@ -24,6 +24,7 @@ table {
 }
 #stat-tot {
     grid-template-columns: auto auto;
+    margin: 5vh;
 }
 
 #settings {

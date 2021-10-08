@@ -306,10 +306,12 @@ export class Database {
         let cell1 = document.createElement("div"),
                 head = document.createElement("h1");
         head.innerHTML = "Assignan"
+        head.align = "center"
         let img = document.createElement("img");
         img.src = "./src/images/Wappen_Assignan.png"
-        img.style.height = '96px'; img.style.width = '96px';
+        img.style.height = '200px'; img.style.width = '200px';
         img.align="right"
+        img.margin = "3vh"
         cell1.appendChild(img)
         container.appendChild(head)
         container.appendChild(cell1)
@@ -327,9 +329,9 @@ export class Database {
         val_aux.total = val_aux.buildings + val_aux.resources
         await this.db.value.put(val_aux);
 
-        pop.style = "white-space: pre"; pop.innerHTML="\t🏘\t-\t"+pop_aux.housings+"\t\t\t\t👪\t-\t"+pop_aux.total+"\n\t🧑\t-\t"+pop_aux.adult+"  \t\t\t🧒\t-\t"+pop_aux.infant;container.appendChild(pop);
+        pop.style = "white-space: pre"; pop.innerHTML="🏘\t-\t"+pop_aux.housings+"\t\t\t\t👪\t-\t"+pop_aux.total+"\n🧑\t-\t"+pop_aux.adult+"  \t\t\t🧒\t-\t"+pop_aux.infant;container.appendChild(pop);
         let cap_txt =""; cap.style = "white-space: pre"; for (let x in cap_aux) {cap_txt += x+":"+cap_aux[x] +""}; cap.innerHTML = cap_txt.replace("name:","").replace("food:","\n\t\t\t&#127828;\t").replace("resources:","\t\t&#129717;\t"); container.appendChild(cap);
-        dipl.style = "white-space: pre"; dipl.innerHTML="\t☆\t-\t"+dipl_aux.fame+"\n\t🗲\t-\t"+dipl_aux.arcane; container.appendChild(dipl);
+        dipl.style = "white-space: pre"; dipl.innerHTML="☆\t-\t"+dipl_aux.fame+"\n🗲\t-\t"+dipl_aux.arcane; container.appendChild(dipl);
         let val_txt ="\&#129689; \tin \t"; val.style = "white-space: pre"; for (let x in val_aux) {val_txt += x+":\t"+val_aux[x] +" "}; val.innerHTML = val_txt.replace("name:\tValue","").replace("resources","\n\tin\t&#127828;&#129717").replace("buildings","\n\tin\t&#127968;&#127970;"); container.appendChild(val);
 
         

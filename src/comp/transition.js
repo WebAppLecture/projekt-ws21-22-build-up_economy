@@ -14,7 +14,7 @@ function getUnhidden(tbls) {
 }
 function clickPopup() {
     console.log("opening manual in popup");
-    window.open('./src/manual.html','manual','height=500,width=400,left=100,top=100,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no, status=yes');
+    window.open('./src/manual.html','manual','height=700,width=500,left=100,top=100,resizable=no,scrollbars=yes,toolbar=no,menubar=no,location=no,directories=no, status=yes');
 };
 
 let btns_top = Array.from(document.querySelectorAll(".controls > button")),

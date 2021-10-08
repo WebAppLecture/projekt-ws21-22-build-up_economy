@@ -38,7 +38,7 @@ body {
         "logo logo logo logo menu"
         "screen screen screen screen screen"
         "dpad dpad dpad B A"
-        "skin-changer skin-changer accent accent accent";
+        "stat-changer stat-changer accent accent accent";
     align-items: center;
     justify-items: center;
 }
@@ -108,13 +108,13 @@ body {
 }
 
 
-.skin-change {
-    grid-area: skin-changer;
+.stat-change {
+    grid-area: stat-changer;
     justify-self: start;
     align-self: end;
 }
 
-.skin-change > div {
+.stat-change > div {
     display: inline-block;
     width: 3vh;
     height: 3vh;

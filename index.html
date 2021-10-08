@@ -17,34 +17,30 @@
                     <button id="btn-stat-goods" data-table="stat-goods">Statistics goods</button>
                     <button id="btn-build" data-table="build">Buildings</button>
                 </div>
-                    <div id="loadfirst">
-                        <h1>You have to load a .json first!</h1>
-                        (In case this is the first time you open that page, 
-                        you maybe want to take a look into ./src/data/reference_database.json)
-                    </div>
-                    
-                    <div class="grid" id="stat-tot"></div>
-                    <div class="grid row5 hidden" id="stat-goods"></div>
-                    <div class="grid row5 hidden" id="build"></div>
-            </nav>
-            <nav class="menu hidden" id="settings">
+                <div id="loadfirst">
+                    <h1>You have to load a .json first!</h1>
+                    <p>(In case this is the first time you open that page, 
+                        you maybe want to take a look into the manual by clicking the moon below.)
+                    </p>
+                </div>
                 
+                <div class="grid" id="stat-tot"></div>
+                <div class="grid row5 hidden" id="stat-goods"></div>
+                <div class="grid row5 hidden" id="build"></div>
             </nav>
+            <nav class="menu hidden" id="settings"></nav>
             <div id="saveload">
-                <button id="save" class="reset">
-                    Save
-                </button>
+                <button id="save" class="reset">Save</button>
                 <input type="file" id="load"  accept="application/json">
                 <input type="button" class="reset" value="Load" onclick="document.getElementById('load').click();" />
             </div>
-            <div id="reset" class="control reset" >Settings</div>
+            <div id="reset" class="control reset">Settings</div>
             <div id="primary" class="control big-button A">Week passed</div>
             <div id="secondary" class="control big-button B">Manual</div>
-            <nav class="skin-change">
+            <nav class="stat-change">
                 <div class="previous"><</div>
                 <div class="next">></div>
             </nav>
-        
             <div class="accent" id="book"></div>
         </div>
     </body>
