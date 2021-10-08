@@ -11,7 +11,7 @@ Leitung: Dr. Friedrich Wünsch, Louis Ritzkowski
 Maximilian Graml
 
 ### Beschreibung ###
-
+!!! Design wird in Chrome verschoben - bitte nur in Firefox öffnen !!!
 ### Umsetzung ###
 
 ### Steuerung (Falls Spiel) ###
