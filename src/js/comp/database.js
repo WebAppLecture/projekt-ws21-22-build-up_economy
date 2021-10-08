@@ -287,8 +287,9 @@ export class Database {
             let diplDB = await this.db.diplomacy.get("Diplomacy"), popsDB = await this.db.population.get("Population");
             
             Object.keys(goods).forEach(res =>{
-                goods[res].total += goods[res].income
+                goods[res].total += goods[res].income;
             });
+            goods["Spiritual Food"].total = 0;
             await this.db.goods.bulkPut(Object.values(goods));
             popsDB.adult += 0.75*diplDB.fame;
             popsDB.infant+= 0.25*diplDB.fame;
