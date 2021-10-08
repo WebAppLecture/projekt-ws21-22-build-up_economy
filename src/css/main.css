@@ -7,6 +7,7 @@ table {
     border-spacing: 0em 0px;
     color: white
 }
+
 .grid {
     display: grid;
     grid-template-columns: auto auto auto auto auto; 
@@ -24,6 +25,7 @@ table {
 #stat-tot {
     grid-template-columns: auto auto;
 }
+
 #settings {
     color: white;
     display: grid;
@@ -42,11 +44,11 @@ table {
     text-align: center;
     color: white;
 }
-.buildable {
+.buildable:hover {
     background: rgb(20, 192, 20);
     color: black;
 }
-.nonbuildable {
+.nonbuildable:hover {
     background: rgb(228, 54, 54);
     color: black;
 }

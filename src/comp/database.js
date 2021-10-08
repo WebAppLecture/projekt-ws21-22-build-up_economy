@@ -333,9 +333,9 @@ export class Database {
         val_aux.total = val_aux.buildings + val_aux.resources
         await this.db.value.put(val_aux);
 
-        let pop_txt =""; for (let x in pop_aux) {pop_txt += x+": "+pop_aux[x] +" "}; pop.innerHTML = pop_txt.replace("name:",""); container.appendChild(pop);
+        pop.style = "white-space: pre"; pop.innerHTML="\t🏘\t-\t"+pop_aux.housings+"\t\t👪\t-\t"+pop_aux.total+"\n\t🧑\t-\t"+pop_aux.adult+"\t\t🧒\t-\t"+pop_aux.infant;container.appendChild(pop);
         let cap_txt =""; for (let x in cap_aux) {cap_txt += x+": "+cap_aux[x] +" "}; cap.innerHTML = cap_txt.replace("name:",""); container.appendChild(cap);
-        let dipl_txt =""; for (let x in dipl_aux) {dipl_txt += x+": "+dipl_aux[x] +" "}; dipl.innerHTML = dipl_txt.replace("name:",""); container.appendChild(dipl);
+        dipl.style = "white-space: pre"; dipl.innerHTML="\t☆\t-\t"+dipl_aux.fame+"\n\t🗲\t-\t"+dipl_aux.arcane; container.appendChild(dipl);
         let val_txt =""; for (let x in val_aux) {val_txt += x+": "+val_aux[x] +" "}; val.innerHTML = val_txt.replace("name:",""); container.appendChild(val);
 
         
@@ -543,26 +543,6 @@ export class Database {
                 const buildable = Object.keys(aux.cost).every(resName => goods[resName].total >= aux.cost[resName]);
                 btn.className = buildable ? "build buildable" : "build nonbuildable";
                 btn.addEventListener("click", ()=>this.buildBuilding(aux.name,1))
-
-                /*btn.addEventListener("mouseenter", async () => {
-                    const buildable = await this.db.transaction("rw",this.db.goods,this.db.buildings, async()=>{
-                        const building = await this.db.buildings.get(aux.name),
-                            requiredGoods = Object.keys(building.cost),
-                            goods = {};
-                        (await this.db.goods.bulkGet(requiredGoods)).forEach((resource, i) => goods[requiredGoods[i]] = resource)
-                        const buildable = requiredGoods.every(resourceName => goods[resourceName].total >= building.cost[resourceName])
-                        return buildable
-                    });
-                    if(!buildable) {
-                        btn.style = 
-                        btn.className = "build nonbuildable";
-                        console.log("nonbuildable")
-                    }
-                    else {
-                        btn.className = "build buildable"
-                    };
-                });
-                btn.addEventListener("mouseleave", () => btn.className = "build");*/
                 container.appendChild(btn)
             }
             else{
