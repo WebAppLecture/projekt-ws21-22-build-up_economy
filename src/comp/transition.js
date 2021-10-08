@@ -14,7 +14,7 @@ function getUnhidden(tbls) {
 }
 function clickPopup() {
     console.log("opening manual in popup");
-    window.open('./src/manual.html','manual','height=700,width=500,left=100,top=100,resizable=no,scrollbars=yes,toolbar=no,menubar=no,location=no,directories=no, status=yes');
+    window.open('./src/manual.html','manual','height=700,width=500');
 };
 
 let btns_top = Array.from(document.querySelectorAll(".controls > button")),
@@ -30,13 +30,17 @@ btn_left.addEventListener("click", () => show(btns_top[(getUnhidden(tbls)+2)%3].
 btn_right.addEventListener("click", () => show(btns_top[(getUnhidden(tbls)+1)%3].dataset.table,tbls))
 btns_top.forEach(btn => btn.addEventListener("click", ()=> show(btn.dataset.table,tbls)));
 btn_settings.addEventListener("click", (btn) => {
-    if (btn.target.innerHTML==="Settings") {
-        btn.target.innerHTML="Back";
-        show("settings",menus);
-    } else if (btn.target.innerHTML==="Back") {
-        btn.target.innerHTML="Settings";
-        show("default",menus);
-    }
+    let ldfst = document.getElementById("loadfirst");
+    if (ldfst.className === "hidden"){
+        if (btn.target.innerHTML==="Settings") {
+            btn.target.innerHTML="Back";
+            show("settings",menus);
+        } else if (btn.target.innerHTML==="Back") {
+            btn.target.innerHTML="Settings";
+            show("default",menus);
+        }
+    };
+    
 });
 btn_weekpsd.addEventListener("click", () => DataAs.weekPassed());
 btn_man.addEventListener("click", () => document.createElement("a").href = clickPopup());

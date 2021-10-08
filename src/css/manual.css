@@ -9,3 +9,12 @@ a{
 a:visited {
     color:rgb(196, 196, 196);
 }
+#icons > li {
+    white-space: pre;
+}
+h1 {
+    text-align: center;
+}
+#toc_container > h4{
+    line-height: 5px;
+}

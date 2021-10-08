@@ -4,23 +4,17 @@
     </head>
     <body>
         <div class="manual">
-            <h1>Manual for Assignan</h1>
+            <h1>Manual for Assignan's economy simulator</h1>
             <div id="toc_container">
                 <p class="toc_title"><h2>Contents</h2></p>
-                <ul class="toc_list">
-                    <li><a href="#GeneralNavigation">1 General navigation</a>
-                  
-                    </li>
-                    <li><a href="#MainScreen">2 The main screen - Statistics</a>
-                        <ul>
-                            <li><a href="#StatsOverall">2.1 Overall statistics</a></li>
-                            <li><a href="#StatsGoods">2.2 Statistics of possessed goods</a></li>
-                            <li><a href="#StatsBuildings">2.3 Statistics of buildings and sources of income</a></li>
-                        </ul>
-                    </li>
-                    <li><a href="#Settings">3 Adjusting the statistics - Settings</a></li>
-                    <li><a href="#SaveLoad">3 Your own village - Save and Load</a></li>
-                </ul>
+                    <h4><a href="#GeneralNavigation">1 General navigation</a></h4>
+                    <h4><a href="#MainScreen">2 The main screen - Statistics</a>
+                            <h4><a href="#StatsOverall">2.1 Overall statistics</a></h4>
+                            <h4><a href="#StatsGoods">2.2 Statistics of possessed goods</a></h4>
+                            <h4><a href="#StatsBuildings">2.3 Statistics of buildings and sources of income</a></h4>
+                    </h4>
+                    <h4><a href="#Settings">3 Adjusting the statistics - Settings</a></h4>
+                    <h4><a href="#SaveLoad">3 Your own village - Save and Load</a></h4>
             </div>
             
             <h2 id="GeneralNavigation">General ideas and navigation</h2>
@@ -43,16 +37,66 @@
                     you can also use the "Week passed"-sun to progress in time and watch your village growing.
                 </p>
             <h2 id="MainScreen">The main screen - Statistics</h2>
+            <p>That one is probably the most important one, which shows all your progress and gives you most of the opportunities 
+                to interact with your village. It is split into three different windows:</p>
             <h3 id="StatsOverall">Overall statistics</h3>
+            <p>In this window, you can find all the informations besides goods and sources of income. The icons have the following meanings:</p>
+                <ul id="icons">
+                    <li>&#127968; - Housings for the people</li>
+                    <li>👪 - total number of inhabitants</li>
+                    <li>🧑 - number of adults</li>
+                    <li>🧒 - number of children</li>
+                    <li>☆ - fame</li>
+                    <li>🗲 - arcane</li>
+                    <li>&#129717; - resources besides food</li>
+                    <li>&#127828; - food</li>
+                    <li>&#129689; - Value in goldpieces</li>
+                    <li>&#127970; - buildings besides housings</li>
+                </ul>
+            <p>Therefore, the left hand side shows the population and "diplomatic" values, whereas the right hand side 
+                shows storage capacities and the value of the assets in Assignan.</p>
             <h3 id="StatsGoods">Statistics of possessed goods</h3>
+            <p>Here, all goods are listed alphabetically with their current total number, 
+                their income in the next week, the value per unit in goldpieces and their total value.</p>
+            <p>Until now, there are no penalties implemented in case of negative number of food or too much resources for the storage capacities.</p>
             <h3 id="StatsBuildings">Statistics of buildings and sources of income</h3>
+            <p>Using that window, you can manage your buildings, monitor their yields and adjust either the number of buildings by investing resources 
+                or the number of other sources of income like for example new workers, which have joint the village in the last week, supporting the existing workers.</p>
             <h2 id="Settings">Adjusting the statistics - Settings</h2>
+                <p>To account for dynamic situation, where Sir Thomas Nook of the East Ind Company
+                    send his best regards and, more important, a ship full of cargo, you can click the "Settings"-button (if 
+                    a json is loaded).
+                </p>
+                <p>
+                    Now, you are able to add goods or buildings/sources of income without messing with the json-file. 
+                </p>
+                <p style="text-decoration: underline;">Adding items</p>
+                <p>Here, you can add or remove a number of existing items by writing a name, selecting one operation 
+                    (Add or Remove) and typing your wanted number. In that case, the Value per Unit is not taken into account, since the item already exists.</p>
+                <p>For a new item, whose name is not known, and therefore not suggested in the droplist, you have to remain with the Add option and also write a Value per Unit.</p>
+                <p style="text-decoration: underline;">Adding new sources of income</p>
+                <p>Moreover, you can use the settings to add NEW and UNBUILDABLE sources of income. If you want to add a new building, which can be built as described in 
+                    section <a href="#StatsBuildings">2.3</a>, you have to deal with the json file by itself, 
+                    as no new buildings were planned at the stage of writing this webside. 
+                    Now, you can add a name, potential constant or weekly yields and whether the number of workers/sources should be variable or fixed. 
+                    By clicking again the arrow button, the database will be updated and the source of income is shown in the table described by section
+                    <a href="#StatsBuildings">2.3</a>.
+                </p>
             <h2 id="SaveLoad">Your own village - Save and Load</h2>
                 <p>
-                    "./src/data/reference_database.json"
+                    If it is your first time visting that page (after clearing your browser's cache),
+                    you have to load a database into the system. That one is saved in a json file as 
+                    in the repository under "./src/data/reference_database.json". Click the load button,
+                    select that (or any other suitable) file and you are ready to go!
+                </p>
+                <p>
+                    After finishing a session, you probably want to save your progress to prevent 
+                    dataloss through cache clearing. Just press the "Save"-button and download the 
+                    current database as a json-file, which can be loaded every time you accidentally 
+                    cleared the cache or you want to revert some changes.
                 </p>
             
-            
+            <h1>Have fun!</h1>
         </div>
 
     </body>
