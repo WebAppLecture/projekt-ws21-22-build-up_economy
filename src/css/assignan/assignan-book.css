@@ -1,4 +1,8 @@
 .accent {
+    grid-area: accent;
+    align-self: end;
+    justify-self: end;
+
     position: absolute;
     background: 
         linear-gradient(25deg, #0000 27%, hsl(34, 57%, 50%) 27.5%, burlywood 71.5%, #0000 72%) 10% 50% / 44% 80% no-repeat,
