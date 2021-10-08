@@ -12,8 +12,6 @@
     -.5vh 0 .8vh 0 var(--bright-gold) inset;
 }
 
-
-
 .d-pad {
     margin-top: 6vh;
 
@@ -74,8 +72,6 @@
     right: 50vh;
     top: 20vh;
     box-shadow: 0 0 .6vh 0 orange;
-    /*background: conic-gradient(#c32e04 22deg, #df6c20 0 67deg, #dfac20 0 112deg, #8db243 0 157deg, hsl(85, 100%, 30%)  0 202deg, #306f91 0 247deg, #9357b9  0 292deg, #660033 0 337deg,#c32e04 0);
-    /*background: conic-gradient(from 0.25turn at 20% 50%, #dfac20, 10deg, #306f91, 350deg, #e6f2f7);*/
     background: radial-gradient(yellow 25%, transparent 40%),repeating-conic-gradient(
     yellow 0deg,
     orange 30deg,
@@ -128,6 +124,7 @@
 .B:active::before {
     transform: translate(-50%, -20%);
 }
+
 .reset {
     border-top: .5vh solid var(--gold);
     border-right: .5vh solid var(--dark-gold);
@@ -136,8 +133,6 @@
  
     font-size: 2.3vh;
 }
-
-
 
 .reset:active {
     font-size: 2vh;
@@ -156,7 +151,6 @@
     font-size: 1.8vh;
     line-height: 2vh;
 }
-
 
 .reset:active,
 .stat-change > div:active {
