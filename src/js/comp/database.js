@@ -315,7 +315,7 @@ export class Database {
         head.innerHTML = "Assignan"
         head.align = "center"
         let img = document.createElement("img");
-        img.src = "/DnD_Economy/src/images/Wappen_Assignan.png"
+        img.src = "{{ site.baseurl }}/src/images/Wappen_Assignan.png"
         img.style.height = '200px'; img.style.width = '200px';
         img.align="right"
         img.margin = "3vh"
