@@ -50,15 +50,15 @@ export class Database {
         }
         let goods = await this.getAllGoods();
 
-        this.infstr = ["House","Storehouse","Fishing Hut","Farm","Gristmill","Carpentry","Fiddler's Green","Silver Mine - unskilled Workers","Silver Mine - skilled Workers","Fishing Village - Paris","Chapel - Lancellin","Inn"];
+        this.infstr = ["House","Storehouse","Fishing Hut","Farm","Gristmill","Carpentry","Fiddler's Green","Silver Mine - unskilled Workers","Silver Mine - skilled Workers","Fishing Village - Paris","Chapel - Lancellin","Inn","Docks"];
         this.infstr_cost = [{"Wood":150,"Stone":100,"GP":475},{"Wood":450,"Stone":300,"GP":925},{"Wood":50,"Stone":20,"GP":140},
             {"Wood":500,"Stone":200,"GP":1900},{"Wood":100,"Stone":75,"GP":300},{"Wood":150,"Stone":100,"GP":550},
-            {"Wood":125,"Stone":75,"GP":800},{},{},{},{"GP": 600},{"GP": 800}];
-        this.infstr_num  = [19,1,3,4,2,0,1,15,4,1,1,1];
-        this.yield_weekly= [{},{},{"Fish": 48},{"Beef": 80, "Wheat": 100},{"Wheat": -200, "Bread": 200, "GP": 2},{"Wood": -4,"Furniture":4},{},{"Silver": 0.064},{"Silver": 0.4},{"Fish": 100},{"Spiritual Food":240},{}];
-        this.yield_const = [{"Housings":8},{"StorRes": 15000, "StorFood": 30000},{},{"Housings":4},{},{},{},{},{},{},{},{}];
-        this.buildable = [true,true,true,true,true,true,true,false,false,false,false,false];
-        this.variable = [false,false,false,false,false,false,false,true,true,false,false,false]
+            {"Wood":125,"Stone":75,"GP":800},{},{},{},{"GP": 600},{"GP": 800},{"GP": 6000}];
+        this.infstr_num  = [19,1,3,4,2,0,1,15,4,1,1,1,1];
+        this.yield_weekly= [{},{},{"Fish": 48},{"Beef": 80, "Wheat": 100},{"Wheat": -200, "Bread": 200, "GP": 2},{"Wood": -4,"Furniture":4},{},{"Silver": 0.064},{"Silver": 0.4},{"Fish": 100},{"Spiritual Food":240},{},{}];
+        this.yield_const = [{"Housings":8},{"StorRes": 15000, "StorFood": 30000},{},{"Housings":4},{},{},{},{},{},{},{},{},{}];
+        this.buildable = [true,true,true,true,true,true,true,false,false,false,false,false,false];
+        this.variable = [false,false,false,false,false,false,false,true,true,false,false,false,false]
         for (let j=0; j<this.infstr.length;j++) {
             let valueBuilding = 0;
             Object.keys(this.infstr_cost[j]).forEach(resource =>{
@@ -315,7 +315,7 @@ export class Database {
         head.innerHTML = "Assignan"
         head.align = "center"
         let img = document.createElement("img");
-        img.src = "./src/images/Wappen_Assignan.png"
+        img.src = "/DnD_Economy/src/images/Wappen_Assignan.PNG"
         img.style.height = '200px'; img.style.width = '200px';
         img.align="right"
         img.margin = "3vh"

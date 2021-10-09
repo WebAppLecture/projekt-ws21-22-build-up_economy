@@ -68,7 +68,7 @@ function keyPressed(e) {
         break;
 
         case 39: // right
-        switchWindows(2);
+        switchWindows(1);
         break;
 
         case 112: // F1

@@ -62,7 +62,7 @@
         },
         {
             "name": "Silver",
-            "income": 2.56,
+            "income": 0,
             "total": 12,
             "valPU": 50
         },
@@ -74,7 +74,7 @@
         },
         {
             "name": "Stone",
-            "income": 0,
+            "income": 216,
             "total": 25,
             "valPU": 3
         },
@@ -120,6 +120,18 @@
             },
             "yield_const": {},
             "value": 600,
+            "buildable": false,
+            "variable": false
+        },
+        {
+            "name": "Docks",
+            "cost": {
+                "GP": 6000
+            },
+            "number": 1,
+            "yield_weekly": {},
+            "yield_const": {},
+            "value": 6000,
             "buildable": false,
             "variable": false
         },
@@ -231,9 +243,37 @@
             "variable": false
         },
         {
-            "name": "Silver Mine - skilled Workers",
+            "name": "Quarry - skilled",
             "cost": {},
             "number": 4,
+            "yield_weekly": {
+                "Stone": "24"
+            },
+            "yield_const": {
+                "0": ""
+            },
+            "value": 0,
+            "buildable": false,
+            "variable": "true"
+        },
+        {
+            "name": "Quarry - unskilled Workers",
+            "cost": {},
+            "number": 15,
+            "yield_weekly": {
+                "Stone": "8"
+            },
+            "yield_const": {
+                "0": ""
+            },
+            "value": 0,
+            "buildable": false,
+            "variable": "true"
+        },
+        {
+            "name": "Silver Mine - skilled Workers",
+            "cost": {},
+            "number": 0,
             "yield_weekly": {
                 "Silver": 0.4
             },
@@ -245,7 +285,7 @@
         {
             "name": "Silver Mine - unskilled Workers",
             "cost": {},
-            "number": 15,
+            "number": 0,
             "yield_weekly": {
                 "Silver": 0.064
             },
@@ -305,9 +345,9 @@
     "value": [
         {
             "name": "Value",
-            "total": 56648,
+            "total": 62648,
             "resources": 17360.5,
-            "buildings": 39287.5
+            "buildings": 45287.5
         }
     ]
 }
