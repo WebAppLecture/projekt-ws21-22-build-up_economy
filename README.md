@@ -17,7 +17,7 @@ Die programmierte Website ermöglicht die Berechnung (vereinfachter) wirtschaftl
 ### Umsetzung ###
 Das Programm wurde mithilfe von Dexie umgesetzt, um eine einfache Handhabung der Daten innerhalb der Datenbank zu erreichen.
 ### Steuerung ###
-Eine ausführliche Anleitung bzw. Beschreibung der Funktionsweisen befindet sich innerhalb der Website als Popup, wenn man den Mond-Button anklickt.
+Eine ausführliche Anleitung bzw. Beschreibung der Funktionsweisen befindet sich innerhalb der Website als Popup, wenn man den Mond-Button anklickt oder F1 drückt. Auch alle anderen Funktionen können via Tastatur aufgerufen werden.
 ### Wichtige Klassen/Dateien ###
 Die Struktur der Website baut sich wie folgt auf:
 

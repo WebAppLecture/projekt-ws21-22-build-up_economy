@@ -24,6 +24,7 @@ export class Database {
                 reader.addEventListener("load", (ev) => this.loadDB(ev.target.result));
                 reader.readAsText(e.target.files[0]);
             });
+            
         //If there is no other possibility, one can recreate the village by uncommenting this command:
         //this.initDatabase();
 
