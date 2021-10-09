@@ -339,7 +339,7 @@ export class Database {
         pop.style = "white-space: pre"; pop.innerHTML="&#127968;\t-\t"+pop_aux.housings+"\t\t\t\t👪\t-\t"+pop_aux.total+"\n🧑\t-\t"+pop_aux.adult+"  \t\t\t🧒\t-\t"+pop_aux.infant;container.appendChild(pop); 
         cap.style = "white-space: pre"; cap.innerHTML = "Storage"+"\t\t&#129717;\t"+cap_aux.resources+"\n\t\t\t&#127828;\t"+cap_aux.food; container.appendChild(cap);
         dipl.style = "white-space: pre"; dipl.innerHTML="☆\t-\t"+dipl_aux.fame+"\n🗲\t-\t"+dipl_aux.arcane; container.appendChild(dipl);
-        val.style = "white-space: pre"; val.innerHTML = "\&#129689; \tin \ttotal\t" + val_aux.total + "\n\tin\t&#127828;&#129717\t" + val_aux.resources + "\n\tin\t&#127968;&#127970;\t" + val_aux.buildings; container.appendChild(val);
+        val.style = "white-space: pre"; val.innerHTML = "\&#129689; \tin \ttotal\t" + val_aux.total.toFixed(2) + "\n\tin\t&#127828;&#129717\t" + val_aux.resources.toFixed(2) + "\n\tin\t&#127968;&#127970;\t" + val_aux.buildings; container.appendChild(val);
         };
 
     //Save the databases as file
