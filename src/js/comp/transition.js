@@ -50,6 +50,14 @@ function switchWindows(offset) {
 //Include keyboard
 document.onkeydown = function(e) {e.repeat ? {} : ( keyPressed(e))};
 function keyPressed(e) {
+    if (e.ctrlKey  && e.keyCode == 83) {    //Speichern via STRG + S
+        e.preventDefault();
+        DataAs.saveDB();
+    };
+    if (e.ctrlKey  && e.keyCode == 76) {    //Laden via STRG + L
+        e.preventDefault();
+        document.getElementById('load').click();
+    };
     switch(e.which) {
         case 37: // left
         switchWindows(2);
