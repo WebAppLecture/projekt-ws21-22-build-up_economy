@@ -6,7 +6,7 @@ export class Database {
               buildings: 'name,cost,number,yield_weekly,yield_const,value,buildable,variable',
               time: 'name,year,week',
               population: 'name,total,adult,infant,housings',
-              capacity: 'name,resources,food',
+              capacity: 'name,resources,food,prodmod',
               diplomacy: 'name,fame,arcane',
               value: 'name,total,resources,buildings'
           });
@@ -26,7 +26,7 @@ export class Database {
             });
             
         //If there is no other possibility, one can recreate the village by uncommenting this command:
-        //sthis.initDatabase();
+        //this.initDatabase();
 
         //Initializes the Settings button (which wont run without data!)
         this.initSettings();
@@ -71,7 +71,7 @@ export class Database {
         }
         await this.db.time.put({name:"Time",year: 1132, week:30});
         await this.db.population.put({name:"Population",total:167,adult:144,infant:23,housings:0});
-        await this.db.capacity.put({name:"Capacity",resources:0,food:0});
+        await this.db.capacity.put({name:"Capacity",resources:0,food:0,prodmod:100});
         
         await this.db.diplomacy.put({name:"Diplomacy",fame: 2,arcane:1});
         await this.db.value.put({name:"Value",total: 0,resources:0,buildings:0});
@@ -343,7 +343,7 @@ export class Database {
         val.style = "white-space: pre"; val.innerHTML = "\&#129689; \tin \ttotal\t" + val_aux.total.toFixed(2) + "\n\tin\t&#127828;&#129717\t" + val_aux.resources.toFixed(2) + "\n\tin\t&#127968;&#127970;\t" + val_aux.buildings; container.appendChild(val);
         
         let prod = document.getElementById("prodmod");
-        prod.innerText += "100 %"
+        prod.innerHTML = "&#9881; "+cap_aux.prodmod+" %"
     };
 
     //Save the databases as file
@@ -513,12 +513,12 @@ export class Database {
 
     //Computes the yield per week writes them into the goods database
     computeWeeklyYield() {
-        return this.db.transaction("rw",this.db.population,this.db.goods,this.db.buildings, async()=>{
+        return this.db.transaction("rw",this.db.population,this.db.goods,this.db.buildings,this.db.capacity, async()=>{
             let incomes = {},
                 number = {};
             (await this.getAllBuildings()).forEach(building => {incomes[building.name] = building.yield_weekly, number[building.name]=building.number});
             let goods = await this.getAllGoods();
-
+            let cap_aux = await this.db.capacity.get("Capacity");
             const pops = await this.db.population.get("Population");
             let cons = 8*(pops.adult+0.5*pops.infant);
             let goods_aux = {...goods};
@@ -531,6 +531,24 @@ export class Database {
             goods_aux["Fish"].income -= cons*0.25;
             goods_aux["Beef"].income -= cons*0.25;
             goods_aux["Bread"].income -= cons*0.5;
+
+            let prodmod = 100
+            for (let item of ["Fish","Beef","Bread"]) {
+                if (goods_aux[item].total + goods_aux[item].income < 0) {
+                    console.log(item)
+                    prodmod -= 25;
+                };
+            };
+            cap_aux.prodmod = prodmod;
+            await this.db.capacity.put(cap_aux);
+            //Since the food for this week is already consumed, we dont recompute the food income based on the total, but on the left income AFTER the village has eaten
+            if (cap_aux.prodmod != 100) {
+                Object.keys(goods_aux).forEach(item => goods_aux[item].income *= cap_aux.prodmod / 100);
+                //Lancellins Food production isnt affected by this
+                goods_aux["Spiritual Food"].income /= cap_aux.prodmod / 100
+            };
+            
+            
             
             goods = {...goods_aux} 
             await this.db.goods.bulkPut(Object.values(goods));
