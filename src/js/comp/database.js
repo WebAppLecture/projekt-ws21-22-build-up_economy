@@ -26,7 +26,7 @@ export class Database {
             });
             
         //If there is no other possibility, one can recreate the village by uncommenting this command:
-        //this.initDatabase();
+        //sthis.initDatabase();
 
         //Initializes the Settings button (which wont run without data!)
         this.initSettings();
@@ -341,7 +341,10 @@ export class Database {
         cap.style = "white-space: pre"; cap.innerHTML = "Storage"+"\t\t&#129717;\t"+cap_aux.resources+"\n\t\t\t&#127828;\t"+cap_aux.food; container.appendChild(cap);
         dipl.style = "white-space: pre"; dipl.innerHTML="☆\t-\t"+dipl_aux.fame+"\n🗲\t-\t"+dipl_aux.arcane; container.appendChild(dipl);
         val.style = "white-space: pre"; val.innerHTML = "\&#129689; \tin \ttotal\t" + val_aux.total.toFixed(2) + "\n\tin\t&#127828;&#129717\t" + val_aux.resources.toFixed(2) + "\n\tin\t&#127968;&#127970;\t" + val_aux.buildings; container.appendChild(val);
-        };
+        
+        let prod = document.getElementById("prodmod");
+        prod.innerText += "100 %"
+    };
 
     //Save the databases as file
     async saveDB() {

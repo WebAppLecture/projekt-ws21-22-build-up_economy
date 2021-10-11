@@ -31,7 +31,7 @@
     width:  6vh;
     height: 6vh;
     position: absolute;
-    right: 50vh;
+    right: 52.7vh;
     top: 20vh;
     box-shadow: 0 0 .6vh 0 orange;
     background: radial-gradient(yellow 25%, transparent 40%),repeating-conic-gradient(
@@ -43,13 +43,13 @@
 }
 .A:active {
     position: absolute;
-    right: 50vh;
+    right: 52.7vh;
     box-shadow: 0 0 .6vh 0 rgb(245, 245, 116),
     0 0 0 2vh inset rgb(245, 245, 116);
 }
 .B {
     grid-area: B;
-    transform: translateX(2vh);
+    transform: translateX(-10vh);
     width:  6vh;
     height: 6vh;
     background: white;
@@ -100,6 +100,8 @@
     width: 8.5vh;
     height: 4.2vh;
     font-size: 2.3vh;
+    background-color: var(--blue);
+    background: linear-gradient(to right,var(--blue) 5%,var(--bright-blue) 60%,var(--blue) 95%); 
 }
 
 .reset:active {
