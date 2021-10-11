@@ -396,9 +396,17 @@ export class Database {
         //Fill the table with values from database
         let valueGoods = 0;
         let goods = await this.getAllGoods();
+        const cap_aux = await this.db.capacity.get("Capacity");
+        let col = "";
+        if (cap_aux.prodmod < 100) {
+            col = "red";
+        }
+        else if (cap_aux.prodmod > 100) {
+            col = green;
+        }
         for (let good of Object.values(goods)) {
             valueGoods+=good.total*good.valPU;
-            this.createCells(container,[good.name,good.total.toFixed(2),good.income.toFixed(2),good.valPU,(good.total*good.valPU).toFixed(2)]);
+            this.createCells(container,[good.name,good.total.toFixed(2),good.income.toFixed(2),good.valPU,(good.total*good.valPU).toFixed(2)],col);
         };
         let aux_val = await this.db.value.get("Value");
         aux_val.resources = valueGoods;
@@ -406,11 +414,14 @@ export class Database {
     };
 
     //Extract the cell creation in the tables
-    createCells(cont,list) {
+    createCells(cont,list, color) {
         for (let i =0; i<list.length;i++) {
             let cell = document.createElement("div");
             cell.className = "cell";
             cell.innerHTML = list[i];
+            if (color != undefined && i === 2) {
+                cell.style.color = color;
+            };
             cont.appendChild(cell);
         };
     };
@@ -545,7 +556,7 @@ export class Database {
             if (cap_aux.prodmod != 100) {
                 Object.keys(goods_aux).forEach(item => goods_aux[item].income *= cap_aux.prodmod / 100);
                 //Lancellins Food production isnt affected by this
-                goods_aux["Spiritual Food"].income /= cap_aux.prodmod / 100
+                goods_aux["Spiritual Food"].income /= cap_aux.prodmod / 100;
             };
             
             
