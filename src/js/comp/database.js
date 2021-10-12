@@ -256,15 +256,21 @@ export class Database {
         Add.appendChild(op)
 
         let inpTotal = document.createElement("input");
-        inpTotal.placeholder="Stored units"
+        inpTotal.placeholder="# of units (Storage!)"
         inpTotal.type = "number"
         inpTotal.id="inpTotal"
+        inpTotal.value="";
+        inpTotal.pattern="(\d|(\d,\d{0,2}))";
+        inpTotal.title="In case of adding more items than available storage, you will add 0 units!"
         Add.appendChild(inpTotal);
 
         let inpVal = document.createElement("input");
         inpVal.placeholder="Value p.U."
         inpVal.type = "number"
         inpVal.id="inpVal"
+        inpVal.value="";
+        inpVal.pattern="(\d|(\d,\d{0,2}))";
+        inpVal.title="Only necessary in case of new items, otherwise it can be left blank."
         Add.appendChild(inpVal);
 
         let btn = document.createElement("button");
@@ -693,10 +699,10 @@ export class Database {
                     aux.total = 0;
                 }
                 else if (addTot > cap.resources - cap.actres && !food.includes(Name)) {
-                    aux.total += cap.resources - cap.actres;
+                    addTot = 0 ;
                 }
                 else if (addTot > cap.food - cap.actfood && food.includes(Name)) {
-                    aux.total += cap.food - cap.actfood;
+                    addTot = 0;
                 }
                 else {
                     aux.total += addTot;
