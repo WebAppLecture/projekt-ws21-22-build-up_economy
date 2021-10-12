@@ -677,13 +677,30 @@ export class Database {
 
     //Adds a particular income or total to a certain (possibly new) good
     async addGood (Name,addInc,addTot,valPU){
-        this.db.transaction("rw",this.db.goods, async () => {
-            let aux = await this.db.goods.get(Name);
+        this.db.transaction("rw",this.db.goods,this.db.capacity, async () => {
+            let aux = await this.db.goods.get(Name),
+                cap = await this.db.capacity.get("Capacity");
+            const food = ["Beef","Fish","Bread"];
             if (aux ===undefined) {
+                if (addTot > cap.resources - cap.actres ) {
+                    addTot = 0;
+                }
                 await this.db.goods.put({name: Name, income: addInc, total: addTot,valPU:valPU});
             }
             else{
-                aux.total += addTot;
+                let sum = aux.total + addTot;
+                if (sum < 0) {
+                    aux.total = 0;
+                }
+                else if (addTot > cap.resources - cap.actres && !food.includes(Name)) {
+                    aux.total += cap.resources - cap.actres;
+                }
+                else if (addTot > cap.food - cap.actfood && food.includes(Name)) {
+                    aux.total += cap.food - cap.actfood;
+                }
+                else {
+                    aux.total += addTot;
+                };
                 await this.db.goods.put(aux);
             }
         }).then(this.update())
