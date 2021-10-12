@@ -417,6 +417,7 @@ export class Database {
             storFood += goods[fd].total
         });
         storGoods -= storFood;
+        storGoods -= goods["GP"].total;
         let aux_val = await this.db.value.get("Value");
         aux_val.resources = valueGoods;
         await this.db.value.put(aux_val)
@@ -548,7 +549,12 @@ export class Database {
             let goods_aux = {...goods};
             
             Object.keys(goods_aux).forEach(resource => {goods_aux[resource].income = 0});
-            Object.keys(incomes).forEach(building => {Object.keys(incomes[building]).forEach((resource,i) => {goods_aux[resource].income += Object.values(incomes[building])[i]*number[building];})});
+            Object.keys(incomes).forEach(building => {Object.keys(incomes[building]).forEach((resource,i) => {
+                goods_aux[resource].income += Object.values(incomes[building])[i]*number[building];
+                if (goods_aux[resource].total < 0 ) {
+                    goods_aux[resource].total = 0
+                };
+            })});
             
             //Managing food consumption
             cons -= goods_aux["Spiritual Food"].income
