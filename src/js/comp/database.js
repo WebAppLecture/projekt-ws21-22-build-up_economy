@@ -301,7 +301,9 @@ export class Database {
 
     //Gathers information from subfunctions and executes them
     async weekPassed() {
-        let time = await this.timeManager();
+        let time = await this.timeManager(),
+            snd = document.getElementById("roostersound");
+        snd.play();
         this.weekPassedComputations();
         this.update();
     };
@@ -611,6 +613,8 @@ export class Database {
  
     //Builds a certain building "number" times and removes the necessary goods from the database
     async buildBuilding (name, number){
+        let snd = document.getElementById("buildingsound");
+        snd.play();
         this.db.transaction("rw",this.db.goods,this.db.buildings, async()=>{
             const building = await this.db.buildings.get(name),
                 requiredGoods = Object.keys(building.cost),

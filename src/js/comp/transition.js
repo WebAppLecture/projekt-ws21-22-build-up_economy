@@ -3,6 +3,8 @@ import { Database } from "./database.js";
 
 //These lines take care of the switching between the windows by arrows at the bottom or button clicks on the top
 function show(elem,list) {
+    let snd = document.getElementById("booksound");
+    snd.play();
     list.forEach(e => e.classList.add("hidden"));
     document.querySelector("#"+elem).classList.remove("hidden")
 }
