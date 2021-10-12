@@ -283,14 +283,41 @@ export class Database {
 
     //Adds the necessary calculations to the weekPassed function
     weekPassedComputations() {
-        return this.db.transaction("rw",this.db.population,this.db.diplomacy,this.db.goods, async ()=>{
+        return this.db.transaction("rw",this.db.population,this.db.diplomacy,this.db.goods,this.db.capacity, async ()=>{
             let goods = await this.getAllGoods();
-            let diplDB = await this.db.diplomacy.get("Diplomacy"), popsDB = await this.db.population.get("Population");
-            
+            let diplDB = await this.db.diplomacy.get("Diplomacy"), popsDB = await this.db.population.get("Population"),
+                capDB = await this.db.capacity.get("Capacity");
+            const food = ["Fish","Beef","Bread"];
+            const unstoredGoods = ["Spiritual Food"]
             Object.keys(goods).forEach(res =>{
-                goods[res].total += goods[res].income;
+                if (unstoredGoods.includes(res)) {
+                    goods[res].total = 0;
+                    return true;
+                }
+                else if (food.includes(res)) {
+                    if (goods[res].income > capDB.food - capDB.actfood ) {
+                        goods[res].total += - capDB.actfood + capDB.food ;
+                    }
+                    else if (goods[res].total < goods[res].income){
+                        goods[res].total = 0;
+                    }
+                    else {
+                        goods[res].total += goods[res].income;
+                    };
+                }
+                else {
+                    if (goods[res].income > capDB.resources - capDB.actres ) {
+                        goods[res].total += - capDB.actres + capDB.resources ;
+                    }
+                    else if (goods[res].total < goods[res].income){
+                        goods[res].total = 0;
+                    }
+                    else {
+                        goods[res].total += goods[res].income;
+                    };
+                };
             });
-            goods["Spiritual Food"].total = 0;
+            
             await this.db.goods.bulkPut(Object.values(goods));
             popsDB.adult += 0.75*diplDB.fame;
             popsDB.infant+= 0.25*diplDB.fame;
