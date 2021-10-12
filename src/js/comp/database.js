@@ -6,7 +6,7 @@ export class Database {
               buildings: 'name,cost,number,yield_weekly,yield_const,value,buildable,variable',
               time: 'name,year,week',
               population: 'name,total,adult,infant,housings',
-              capacity: 'name,resources,food,prodmod',
+              capacity: 'name,resources,food,prodmod,actres,actfood',
               diplomacy: 'name,fame,arcane',
               value: 'name,total,resources,buildings'
           });
@@ -335,10 +335,9 @@ export class Database {
 
         val_aux.total = val_aux.buildings + val_aux.resources
         await this.db.value.put(val_aux);
-
         //Creating strings for cells with correct formatting
         pop.style = "white-space: pre"; pop.innerHTML="&#127968;\t-\t"+pop_aux.housings+"\t\t\t\t👪\t-\t"+pop_aux.total+"\n🧑\t-\t"+pop_aux.adult+"  \t\t\t🧒\t-\t"+pop_aux.infant;container.appendChild(pop); 
-        cap.style = "white-space: pre"; cap.innerHTML = "Storage"+"\t\t&#129717;\t"+cap_aux.resources+"\n\t\t\t&#127828;\t"+cap_aux.food; container.appendChild(cap);
+        cap.style = "white-space: pre"; cap.innerHTML = "Storage"+"\t\t&#129717;\tused\t"+cap_aux.actres+"\tof\t"+cap_aux.resources+"\n\t\t\t&#127828;\tused\t"+cap_aux.actfood+"\tof\t"+cap_aux.food; container.appendChild(cap);
         dipl.style = "white-space: pre"; dipl.innerHTML="☆\t-\t"+dipl_aux.fame+"\n🗲\t-\t"+dipl_aux.arcane; container.appendChild(dipl);
         val.style = "white-space: pre"; val.innerHTML = "\&#129689; \tin \ttotal\t" + val_aux.total.toFixed(2) + "\n\tin\t&#127828;&#129717\t" + val_aux.resources.toFixed(2) + "\n\tin\t&#127968;&#127970;\t" + val_aux.buildings; container.appendChild(val);
         
@@ -394,7 +393,9 @@ export class Database {
         this.createLine(container,5);
 
         //Fill the table with values from database
-        let valueGoods = 0;
+        let valueGoods = 0,
+            storGoods = 0,
+            storFood = 0;
         let goods = await this.getAllGoods();
         const cap_aux = await this.db.capacity.get("Capacity");
         let col = "";
@@ -406,11 +407,21 @@ export class Database {
         }
         for (let good of Object.values(goods)) {
             valueGoods+=good.total*good.valPU;
+            storGoods += good.total
             this.createCells(container,[good.name,good.total.toFixed(2),good.income.toFixed(2),good.valPU,(good.total*good.valPU).toFixed(2)],col);
         };
+        const food = ["Fish","Beef","Bread"];
+        food.forEach(fd => {
+            storFood += goods[fd].total
+        });
+        storGoods -= storFood;
         let aux_val = await this.db.value.get("Value");
         aux_val.resources = valueGoods;
         await this.db.value.put(aux_val)
+        let aux_cap = await this.db.capacity.get("Capacity");
+        aux_cap.actres = storGoods;
+        aux_cap.actfood = storFood;
+        await this.db.capacity.put(aux_cap)
     };
 
     //Extract the cell creation in the tables
