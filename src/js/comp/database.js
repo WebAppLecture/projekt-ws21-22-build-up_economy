@@ -2,12 +2,12 @@ export class Database {
     constructor() {
           this.db = new Dexie("assignan_database");
           this.db.version(1).stores({
-              goods: 'name,income,total,valPU',
+              goods: 'name,income,total,valPU,food,unstorable,consmod',
               buildings: 'name,cost,number,yield_weekly,yield_const,value,buildable,variable',
               time: 'name,year,week',
               population: 'name,total,adult,infant,housings',
               capacity: 'name,resources,food,prodmod,actres,actfood',
-              diplomacy: 'name,fame,arcane',
+              diplomacy: 'name,fame,arcane,fameinfo,actualfame',
               value: 'name,total,resources,buildings'
           });
 
@@ -26,7 +26,7 @@ export class Database {
             });
             
         //If there is no other possibility, one can recreate the village by uncommenting this command:
-        //this.initDatabase();
+        this.initDatabase();
 
         //Initializes the Settings button (which wont run without data!)
         this.initSettings();
@@ -43,10 +43,12 @@ export class Database {
         this.assets = ["Wood","Stone","Silver","Marble","Glass","Gold","Grapes","Pottery","Furniture","Bread","Wheat","Beef","Fish","Spiritual Food","GP"];
         this.asset_num = [5475,25,12,220,625,5,40,60,0,1250,0,700,300,0,2658];
         this.asset_VPU = [1.5,3,50,10,4,100,2.5,2,6.5,0.1,0.1,0.3,0.2,0,1];
-        
+        this.asset_food = [false,false,false,false,false,false,false,false,false,true,false,true,true,false,false];
+        this.unstorable = [false,false,false,false,false,false,false,false,false,false,false,false,false,true,false];
+        this.consmod = [0,0,0,0,0,0,0,0,0,2,0,1,1,0,0];
         
         for (let i=0;i<this.assets.length;i++) {
-            this.db.goods.put({name:this.assets[i],income:0,total:this.asset_num[i],valPU:this.asset_VPU[i]});
+            this.db.goods.put({name:this.assets[i],income:0,total:this.asset_num[i],valPU:this.asset_VPU[i],food:this.asset_food[i],unstorable:this.unstorable[i],consmod:this.consmod[i]});
         }
         let goods = await this.getAllGoods();
 
@@ -73,7 +75,7 @@ export class Database {
         await this.db.population.put({name:"Population",total:167,adult:144,infant:23,housings:0});
         await this.db.capacity.put({name:"Capacity",resources:0,food:0,prodmod:100});
         
-        await this.db.diplomacy.put({name:"Diplomacy",fame: 2,arcane:1});
+        await this.db.diplomacy.put({name:"Diplomacy",fame: 2,arcane:1,fameinfo:"",actualfame: 2});
         await this.db.value.put({name:"Value",total: 0,resources:0,buildings:0});
     };
 
@@ -293,14 +295,13 @@ export class Database {
             let goods = await this.getAllGoods();
             let diplDB = await this.db.diplomacy.get("Diplomacy"), popsDB = await this.db.population.get("Population"),
                 capDB = await this.db.capacity.get("Capacity");
-            const food = ["Fish","Beef","Bread"];
-            const unstoredGoods = ["Spiritual Food"]
+
             Object.keys(goods).forEach(res =>{
-                if (unstoredGoods.includes(res)) {
+                if (goods[res].unstorable ) {
                     goods[res].total = 0;
                     return true;
                 }
-                else if (food.includes(res)) {
+                else if (goods[res].food ) {
                     if (goods[res].income > capDB.food - capDB.actfood ) {
                         goods[res].total += - capDB.actfood + capDB.food ;
                     }
@@ -325,8 +326,8 @@ export class Database {
             });
             
             await this.db.goods.bulkPut(Object.values(goods));
-            popsDB.adult += 0.75*diplDB.fame;
-            popsDB.infant+= 0.25*diplDB.fame;
+            popsDB.adult += 0.75*diplDB.actualfame;
+            popsDB.infant+= 0.25*diplDB.actualfame;
             popsDB.total = popsDB.adult + popsDB.infant;
             await this.db.population.put(popsDB);
         })
@@ -372,8 +373,8 @@ export class Database {
         await this.db.value.put(val_aux);
         //Creating strings for cells with correct formatting
         pop.style = "white-space: pre"; pop.innerHTML="&#127968;\t-\t"+pop_aux.housings+"\t\t\t\t👪\t-\t"+pop_aux.total+"\n🧑\t-\t"+pop_aux.adult+"  \t\t\t🧒\t-\t"+pop_aux.infant;container.appendChild(pop); 
-        cap.style = "white-space: pre"; cap.innerHTML = "Storage"+"\t\t&#129717;\tused\t"+cap_aux.actres+"\tof\t"+cap_aux.resources+"\n\t\t\t&#127828;\tused\t"+cap_aux.actfood+"\tof\t"+cap_aux.food; container.appendChild(cap);
-        dipl.style = "white-space: pre"; dipl.innerHTML="☆\t-\t"+dipl_aux.fame+"\n🗲\t-\t"+dipl_aux.arcane; container.appendChild(dipl);
+        cap.style = "white-space: pre"; cap.innerHTML = "Storage"+"\t\t&#129717;\tused\t"+cap_aux.actres.toFixed(2)+"\tof\t"+cap_aux.resources+"\n\t\t\t&#127828;\tused\t"+cap_aux.actfood.toFixed(2)+"\tof\t"+cap_aux.food; container.appendChild(cap);
+        dipl.style = "white-space: pre"; dipl.innerHTML="☆\t-\t"+dipl_aux.actualfame+"\t"+dipl_aux.fameinfo+"\n🗲\t-\t"+dipl_aux.arcane; container.appendChild(dipl);
         val.style = "white-space: pre"; val.innerHTML = "\&#129689; \tin \ttotal\t" + val_aux.total.toFixed(2) + "\n\tin\t&#127828;&#129717\t" + val_aux.resources.toFixed(2) + "\n\tin\t&#127968;&#127970;\t" + val_aux.buildings; container.appendChild(val);
         
         let prod = document.getElementById("prodmod");
@@ -438,16 +439,18 @@ export class Database {
             col = "red";
         }
         else if (cap_aux.prodmod > 100) {
-            col = green;
+            col = "green";
         }
         for (let good of Object.values(goods)) {
             valueGoods+=good.total*good.valPU;
             storGoods += good.total
             this.createCells(container,[good.name,good.total.toFixed(2),good.income.toFixed(2),good.valPU,(good.total*good.valPU).toFixed(2)],col);
         };
-        const food = ["Fish","Beef","Bread"];
-        food.forEach(fd => {
-            storFood += goods[fd].total
+
+        Object.keys(goods).forEach(key => {
+            if (goods[key].food) {
+                storFood += goods[key].total
+            };
         });
         storGoods -= storFood;
         storGoods -= goods["GP"].total;
@@ -571,7 +574,7 @@ export class Database {
 
     //Computes the yield per week writes them into the goods database
     computeWeeklyYield() {
-        return this.db.transaction("rw",this.db.population,this.db.goods,this.db.buildings,this.db.capacity, async()=>{
+        return this.db.transaction("rw",this.db.population,this.db.goods,this.db.buildings,this.db.capacity,this.db.diplomacy, async()=>{
             let incomes = {},
                 number = {};
             (await this.getAllBuildings()).forEach(building => {incomes[building.name] = building.yield_weekly, number[building.name]=building.number});
@@ -588,30 +591,56 @@ export class Database {
                     goods_aux[resource].total = 0
                 };
             })});
-            
+            let food = [], 
+                consmod = [],
+                consmod_tot = 0;
+            Object.keys(goods_aux).forEach( key => {
+                if (goods_aux[key].food) {
+                    food.push(key);
+                    consmod.push(goods_aux[key].consmod);
+                    consmod_tot += goods_aux[key].consmod;
+                };
+            });
+
             //Managing food consumption
             cons -= goods_aux["Spiritual Food"].income
-            goods_aux["Fish"].income -= cons*0.25;
-            goods_aux["Beef"].income -= cons*0.25;
-            goods_aux["Bread"].income -= cons*0.5;
+            for (let i in food) {
+                console.log(consmod[i]/consmod_tot)
+                goods_aux[food[i]].income -= cons*consmod[i]/consmod_tot;
+            };
 
-            let prodmod = 100
-            for (let item of ["Fish","Beef","Bread"]) {
-                if (goods_aux[item].total + goods_aux[item].income < 0) {
-                    console.log(item)
-                    prodmod -= 25;
+            //Managing debuffs in case of missing food proportional to the importance of the food
+            let prodmod = 100;
+            let diplDB = await this.db.diplomacy.get("Diplomacy");
+            console.log(diplDB)
+            for (let i in food) {
+                if (goods_aux[food[i]].total + goods_aux[food[i]].income < 0) {
+                    console.log(food[i],(consmod[i]/consmod_tot).toFixed(2)*100)
+                    prodmod -= (consmod[i]/consmod_tot).toFixed(2)*100;
                 };
             };
             cap_aux.prodmod = prodmod;
             await this.db.capacity.put(cap_aux);
             //Since the food for this week is already consumed, we dont recompute the food income based on the total, but on the left income AFTER the village has eaten
             if (cap_aux.prodmod != 100) {
+                if (cap_aux.prodmod <= 50) {
+                    diplDB.actualfame = diplDB.fame*cap_aux.prodmod/100;
+                    diplDB.fameinfo = "The village starts to collapse!";
+                }
+                else if (cap_aux.prodmod > 100) {
+                    diplDB.actualfame = diplDB.fame* (cap_aux.prodmod-100)*10/100;
+                    diplDB.fameinfo = "The village is prospering!";
+                }
+                else {
+                    diplDB.fameinfo = "";
+                    diplDB.actualfame = diplDB.fame;
+                };
                 Object.keys(goods_aux).forEach(item => goods_aux[item].income *= cap_aux.prodmod / 100);
                 //Lancellins Food production isnt affected by this
                 goods_aux["Spiritual Food"].income /= cap_aux.prodmod / 100;
             };
             
-            
+            await this.db.diplomacy.put(diplDB);
             
             goods = {...goods_aux} 
             await this.db.goods.bulkPut(Object.values(goods));
@@ -686,7 +715,7 @@ export class Database {
         this.db.transaction("rw",this.db.goods,this.db.capacity, async () => {
             let aux = await this.db.goods.get(Name),
                 cap = await this.db.capacity.get("Capacity");
-            const food = ["Beef","Fish","Bread"];
+
             if (aux ===undefined) {
                 if (addTot > cap.resources - cap.actres ) {
                     addTot = 0;
@@ -694,14 +723,15 @@ export class Database {
                 await this.db.goods.put({name: Name, income: addInc, total: addTot,valPU:valPU});
             }
             else{
+                //Takes care of storage capacities
                 let sum = aux.total + addTot;
                 if (sum < 0) {
                     aux.total = 0;
                 }
-                else if (addTot > cap.resources - cap.actres && !food.includes(Name)) {
+                else if (addTot > cap.resources - cap.actres && !aux.food) {
                     addTot = 0 ;
                 }
-                else if (addTot > cap.food - cap.actfood && food.includes(Name)) {
+                else if (addTot > cap.food - cap.actfood && aux.food) {
                     addTot = 0;
                 }
                 else {
