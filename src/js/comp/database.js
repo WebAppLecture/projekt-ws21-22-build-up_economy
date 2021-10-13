@@ -6,7 +6,7 @@ export class Database {
               buildings: 'name,cost,number,yield_weekly,yield_const,value,buildable,variable',
               time: 'name,year,week',
               population: 'name,total,adult,infant,housings',
-              capacity: 'name,resources,food',
+              capacity: 'name,resources,food,prodmod,actres,actfood',
               diplomacy: 'name,fame,arcane',
               value: 'name,total,resources,buildings'
           });
@@ -71,7 +71,7 @@ export class Database {
         }
         await this.db.time.put({name:"Time",year: 1132, week:30});
         await this.db.population.put({name:"Population",total:167,adult:144,infant:23,housings:0});
-        await this.db.capacity.put({name:"Capacity",resources:0,food:0});
+        await this.db.capacity.put({name:"Capacity",resources:0,food:0,prodmod:100});
         
         await this.db.diplomacy.put({name:"Diplomacy",fame: 2,arcane:1});
         await this.db.value.put({name:"Value",total: 0,resources:0,buildings:0});
@@ -256,15 +256,21 @@ export class Database {
         Add.appendChild(op)
 
         let inpTotal = document.createElement("input");
-        inpTotal.placeholder="Stored units"
+        inpTotal.placeholder="# of units (Storage!)"
         inpTotal.type = "number"
         inpTotal.id="inpTotal"
+        inpTotal.value="";
+        inpTotal.pattern="(\d|(\d,\d{0,2}))";
+        inpTotal.title="In case of adding more items than available storage, you will add 0 units!"
         Add.appendChild(inpTotal);
 
         let inpVal = document.createElement("input");
         inpVal.placeholder="Value p.U."
         inpVal.type = "number"
         inpVal.id="inpVal"
+        inpVal.value="";
+        inpVal.pattern="(\d|(\d,\d{0,2}))";
+        inpVal.title="Only necessary in case of new items, otherwise it can be left blank."
         Add.appendChild(inpVal);
 
         let btn = document.createElement("button");
@@ -283,14 +289,41 @@ export class Database {
 
     //Adds the necessary calculations to the weekPassed function
     weekPassedComputations() {
-        return this.db.transaction("rw",this.db.population,this.db.diplomacy,this.db.goods, async ()=>{
+        return this.db.transaction("rw",this.db.population,this.db.diplomacy,this.db.goods,this.db.capacity, async ()=>{
             let goods = await this.getAllGoods();
-            let diplDB = await this.db.diplomacy.get("Diplomacy"), popsDB = await this.db.population.get("Population");
-            
+            let diplDB = await this.db.diplomacy.get("Diplomacy"), popsDB = await this.db.population.get("Population"),
+                capDB = await this.db.capacity.get("Capacity");
+            const food = ["Fish","Beef","Bread"];
+            const unstoredGoods = ["Spiritual Food"]
             Object.keys(goods).forEach(res =>{
-                goods[res].total += goods[res].income;
+                if (unstoredGoods.includes(res)) {
+                    goods[res].total = 0;
+                    return true;
+                }
+                else if (food.includes(res)) {
+                    if (goods[res].income > capDB.food - capDB.actfood ) {
+                        goods[res].total += - capDB.actfood + capDB.food ;
+                    }
+                    else if (goods[res].total < goods[res].income){
+                        goods[res].total = 0;
+                    }
+                    else {
+                        goods[res].total += goods[res].income;
+                    };
+                }
+                else {
+                    if (goods[res].income > capDB.resources - capDB.actres ) {
+                        goods[res].total += - capDB.actres + capDB.resources ;
+                    }
+                    else if (goods[res].total < goods[res].income){
+                        goods[res].total = 0;
+                    }
+                    else {
+                        goods[res].total += goods[res].income;
+                    };
+                };
             });
-            goods["Spiritual Food"].total = 0;
+            
             await this.db.goods.bulkPut(Object.values(goods));
             popsDB.adult += 0.75*diplDB.fame;
             popsDB.infant+= 0.25*diplDB.fame;
@@ -301,7 +334,9 @@ export class Database {
 
     //Gathers information from subfunctions and executes them
     async weekPassed() {
-        let time = await this.timeManager();
+        let time = await this.timeManager(),
+            snd = document.getElementById("roostersound");
+        snd.play();
         this.weekPassedComputations();
         this.update();
     };
@@ -335,13 +370,15 @@ export class Database {
 
         val_aux.total = val_aux.buildings + val_aux.resources
         await this.db.value.put(val_aux);
-
         //Creating strings for cells with correct formatting
         pop.style = "white-space: pre"; pop.innerHTML="&#127968;\t-\t"+pop_aux.housings+"\t\t\t\t👪\t-\t"+pop_aux.total+"\n🧑\t-\t"+pop_aux.adult+"  \t\t\t🧒\t-\t"+pop_aux.infant;container.appendChild(pop); 
-        cap.style = "white-space: pre"; cap.innerHTML = "Storage"+"\t\t&#129717;\t"+cap_aux.resources+"\n\t\t\t&#127828;\t"+cap_aux.food; container.appendChild(cap);
+        cap.style = "white-space: pre"; cap.innerHTML = "Storage"+"\t\t&#129717;\tused\t"+cap_aux.actres+"\tof\t"+cap_aux.resources+"\n\t\t\t&#127828;\tused\t"+cap_aux.actfood+"\tof\t"+cap_aux.food; container.appendChild(cap);
         dipl.style = "white-space: pre"; dipl.innerHTML="☆\t-\t"+dipl_aux.fame+"\n🗲\t-\t"+dipl_aux.arcane; container.appendChild(dipl);
         val.style = "white-space: pre"; val.innerHTML = "\&#129689; \tin \ttotal\t" + val_aux.total.toFixed(2) + "\n\tin\t&#127828;&#129717\t" + val_aux.resources.toFixed(2) + "\n\tin\t&#127968;&#127970;\t" + val_aux.buildings; container.appendChild(val);
-        };
+        
+        let prod = document.getElementById("prodmod");
+        prod.innerHTML = "&#9881; "+cap_aux.prodmod+" %"
+    };
 
     //Save the databases as file
     async saveDB() {
@@ -391,23 +428,47 @@ export class Database {
         this.createLine(container,5);
 
         //Fill the table with values from database
-        let valueGoods = 0;
+        let valueGoods = 0,
+            storGoods = 0,
+            storFood = 0;
         let goods = await this.getAllGoods();
+        const cap_aux = await this.db.capacity.get("Capacity");
+        let col = "";
+        if (cap_aux.prodmod < 100) {
+            col = "red";
+        }
+        else if (cap_aux.prodmod > 100) {
+            col = green;
+        }
         for (let good of Object.values(goods)) {
             valueGoods+=good.total*good.valPU;
-            this.createCells(container,[good.name,good.total.toFixed(2),good.income.toFixed(2),good.valPU,(good.total*good.valPU).toFixed(2)]);
+            storGoods += good.total
+            this.createCells(container,[good.name,good.total.toFixed(2),good.income.toFixed(2),good.valPU,(good.total*good.valPU).toFixed(2)],col);
         };
+        const food = ["Fish","Beef","Bread"];
+        food.forEach(fd => {
+            storFood += goods[fd].total
+        });
+        storGoods -= storFood;
+        storGoods -= goods["GP"].total;
         let aux_val = await this.db.value.get("Value");
         aux_val.resources = valueGoods;
         await this.db.value.put(aux_val)
+        let aux_cap = await this.db.capacity.get("Capacity");
+        aux_cap.actres = storGoods;
+        aux_cap.actfood = storFood;
+        await this.db.capacity.put(aux_cap)
     };
 
     //Extract the cell creation in the tables
-    createCells(cont,list) {
+    createCells(cont,list, color) {
         for (let i =0; i<list.length;i++) {
             let cell = document.createElement("div");
             cell.className = "cell";
             cell.innerHTML = list[i];
+            if (color != undefined && i === 2) {
+                cell.style.color = color;
+            };
             cont.appendChild(cell);
         };
     };
@@ -510,24 +571,47 @@ export class Database {
 
     //Computes the yield per week writes them into the goods database
     computeWeeklyYield() {
-        return this.db.transaction("rw",this.db.population,this.db.goods,this.db.buildings, async()=>{
+        return this.db.transaction("rw",this.db.population,this.db.goods,this.db.buildings,this.db.capacity, async()=>{
             let incomes = {},
                 number = {};
             (await this.getAllBuildings()).forEach(building => {incomes[building.name] = building.yield_weekly, number[building.name]=building.number});
             let goods = await this.getAllGoods();
-
+            let cap_aux = await this.db.capacity.get("Capacity");
             const pops = await this.db.population.get("Population");
             let cons = 8*(pops.adult+0.5*pops.infant);
             let goods_aux = {...goods};
             
             Object.keys(goods_aux).forEach(resource => {goods_aux[resource].income = 0});
-            Object.keys(incomes).forEach(building => {Object.keys(incomes[building]).forEach((resource,i) => {goods_aux[resource].income += Object.values(incomes[building])[i]*number[building];})});
+            Object.keys(incomes).forEach(building => {Object.keys(incomes[building]).forEach((resource,i) => {
+                goods_aux[resource].income += Object.values(incomes[building])[i]*number[building];
+                if (goods_aux[resource].total < 0 ) {
+                    goods_aux[resource].total = 0
+                };
+            })});
             
             //Managing food consumption
             cons -= goods_aux["Spiritual Food"].income
             goods_aux["Fish"].income -= cons*0.25;
             goods_aux["Beef"].income -= cons*0.25;
             goods_aux["Bread"].income -= cons*0.5;
+
+            let prodmod = 100
+            for (let item of ["Fish","Beef","Bread"]) {
+                if (goods_aux[item].total + goods_aux[item].income < 0) {
+                    console.log(item)
+                    prodmod -= 25;
+                };
+            };
+            cap_aux.prodmod = prodmod;
+            await this.db.capacity.put(cap_aux);
+            //Since the food for this week is already consumed, we dont recompute the food income based on the total, but on the left income AFTER the village has eaten
+            if (cap_aux.prodmod != 100) {
+                Object.keys(goods_aux).forEach(item => goods_aux[item].income *= cap_aux.prodmod / 100);
+                //Lancellins Food production isnt affected by this
+                goods_aux["Spiritual Food"].income /= cap_aux.prodmod / 100;
+            };
+            
+            
             
             goods = {...goods_aux} 
             await this.db.goods.bulkPut(Object.values(goods));
@@ -568,6 +652,8 @@ export class Database {
  
     //Builds a certain building "number" times and removes the necessary goods from the database
     async buildBuilding (name, number){
+        let snd = document.getElementById("buildingsound");
+        snd.play();
         this.db.transaction("rw",this.db.goods,this.db.buildings, async()=>{
             const building = await this.db.buildings.get(name),
                 requiredGoods = Object.keys(building.cost),
@@ -597,13 +683,30 @@ export class Database {
 
     //Adds a particular income or total to a certain (possibly new) good
     async addGood (Name,addInc,addTot,valPU){
-        this.db.transaction("rw",this.db.goods, async () => {
-            let aux = await this.db.goods.get(Name);
+        this.db.transaction("rw",this.db.goods,this.db.capacity, async () => {
+            let aux = await this.db.goods.get(Name),
+                cap = await this.db.capacity.get("Capacity");
+            const food = ["Beef","Fish","Bread"];
             if (aux ===undefined) {
+                if (addTot > cap.resources - cap.actres ) {
+                    addTot = 0;
+                }
                 await this.db.goods.put({name: Name, income: addInc, total: addTot,valPU:valPU});
             }
             else{
-                aux.total += addTot;
+                let sum = aux.total + addTot;
+                if (sum < 0) {
+                    aux.total = 0;
+                }
+                else if (addTot > cap.resources - cap.actres && !food.includes(Name)) {
+                    addTot = 0 ;
+                }
+                else if (addTot > cap.food - cap.actfood && food.includes(Name)) {
+                    addTot = 0;
+                }
+                else {
+                    aux.total += addTot;
+                };
                 await this.db.goods.put(aux);
             }
         }).then(this.update())
