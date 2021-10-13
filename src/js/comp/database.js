@@ -10,6 +10,8 @@ export class Database {
               diplomacy: 'name,fame,arcane,fameinfo,actualfame',
               value: 'name,total,resources,buildings'
           });
+        //Loads Errorsound
+        this.errorsnd = document.getElementById("errorsound");
 
         //Takes care of the possibility to load databases in case of missing data
         
@@ -299,13 +301,12 @@ export class Database {
             Object.keys(goods).forEach(res =>{
                 if (goods[res].unstorable ) {
                     goods[res].total = 0;
-                    return true;
                 }
                 else if (goods[res].food ) {
                     if (goods[res].income > capDB.food - capDB.actfood ) {
                         goods[res].total += - capDB.actfood + capDB.food ;
                     }
-                    else if (goods[res].total < goods[res].income){
+                    else if (goods[res].total < goods[res].income && goods[res].income < 0){
                         goods[res].total = 0;
                     }
                     else {
@@ -316,7 +317,7 @@ export class Database {
                     if (goods[res].income > capDB.resources - capDB.actres ) {
                         goods[res].total += - capDB.actres + capDB.resources ;
                     }
-                    else if (goods[res].total < goods[res].income){
+                    else if (goods[res].total < goods[res].income && goods[res].income < 0){
                         goods[res].total = 0;
                     }
                     else {
@@ -335,11 +336,25 @@ export class Database {
 
     //Gathers information from subfunctions and executes them
     async weekPassed() {
-        let time = await this.timeManager(),
-            snd = document.getElementById("roostersound");
-        snd.play();
+        
         this.weekPassedComputations();
         this.update();
+        let cap_aux = await this.db.capacity.get("Capacity");
+        //Plays sound dependent on happiness in the village
+        
+        if (cap_aux.prodmod <= 50) {
+            let riotsnd = document.getElementById("riotingsound");
+            riotsnd.play();
+        }
+        else if (cap_aux.prodmod > 100) {
+            let cheersnd = document.getElementById("cheeringsound");
+            cheersnd.play();
+        }
+        else {
+            let snd = document.getElementById("roostersound");
+            snd.play();
+        };
+        
     };
 
     //Creates default page and computes current value of several assets and in total
@@ -372,10 +387,10 @@ export class Database {
         val_aux.total = val_aux.buildings + val_aux.resources
         await this.db.value.put(val_aux);
         //Creating strings for cells with correct formatting
-        pop.style = "white-space: pre"; pop.innerHTML="&#127968;\t-\t"+pop_aux.housings+"\t\t\t\t👪\t-\t"+pop_aux.total+"\n🧑\t-\t"+pop_aux.adult+"  \t\t\t🧒\t-\t"+pop_aux.infant;container.appendChild(pop); 
+        pop.style = "white-space: pre"; pop.innerHTML="&#127968;\t-\t"+pop_aux.housings+"\t\t\t\t👪\t-\t"+pop_aux.total.toFixed(2)+"\n🧑\t-\t"+pop_aux.adult.toFixed(2)+"  \t\t\t🧒\t-\t"+pop_aux.infant.toFixed(2);container.appendChild(pop); 
         cap.style = "white-space: pre"; cap.innerHTML = "Storage"+"\t\t&#129717;\tused\t"+cap_aux.actres.toFixed(2)+"\tof\t"+cap_aux.resources+"\n\t\t\t&#127828;\tused\t"+cap_aux.actfood.toFixed(2)+"\tof\t"+cap_aux.food; container.appendChild(cap);
         dipl.style = "white-space: pre"; dipl.innerHTML="☆\t-\t"+dipl_aux.actualfame+"\t"+dipl_aux.fameinfo+"\n🗲\t-\t"+dipl_aux.arcane; container.appendChild(dipl);
-        val.style = "white-space: pre"; val.innerHTML = "\&#129689; \tin \ttotal\t" + val_aux.total.toFixed(2) + "\n\tin\t&#127828;&#129717\t" + val_aux.resources.toFixed(2) + "\n\tin\t&#127968;&#127970;\t" + val_aux.buildings; container.appendChild(val);
+        val.style = "white-space: pre"; val.innerHTML = "\&#129689; \tin \ttotal\t" + val_aux.total.toFixed(2) + "\n\tin\t&#127828;&#129717\t" + val_aux.resources.toFixed(2) + "\n\tin\t&#127968;&#127970;\t" + val_aux.buildings.toFixed(2); container.appendChild(val);
         
         let prod = document.getElementById("prodmod");
         prod.innerHTML = "&#9881; "+cap_aux.prodmod+" %"
@@ -605,30 +620,26 @@ export class Database {
             //Managing food consumption
             cons -= goods_aux["Spiritual Food"].income
             for (let i in food) {
-                console.log(consmod[i]/consmod_tot)
                 goods_aux[food[i]].income -= cons*consmod[i]/consmod_tot;
             };
 
             //Managing debuffs in case of missing food proportional to the importance of the food
             let prodmod = 100;
             let diplDB = await this.db.diplomacy.get("Diplomacy");
-            console.log(diplDB)
             for (let i in food) {
                 if (goods_aux[food[i]].total + goods_aux[food[i]].income < 0) {
-                    console.log(food[i],(consmod[i]/consmod_tot).toFixed(2)*100)
                     prodmod -= (consmod[i]/consmod_tot).toFixed(2)*100;
                 };
             };
             cap_aux.prodmod = prodmod;
-            await this.db.capacity.put(cap_aux);
+            
             //Since the food for this week is already consumed, we dont recompute the food income based on the total, but on the left income AFTER the village has eaten
             if (cap_aux.prodmod != 100) {
                 if (cap_aux.prodmod <= 50) {
                     diplDB.actualfame = diplDB.fame*cap_aux.prodmod/100;
-                    diplDB.fameinfo = "The village starts to collapse!";
                 }
                 else if (cap_aux.prodmod > 100) {
-                    diplDB.actualfame = diplDB.fame* (cap_aux.prodmod-100)*10/100;
+                    diplDB.actualfame = diplDB.fame*(1 + (cap_aux.prodmod-100)*10/100);
                     diplDB.fameinfo = "The village is prospering!";
                 }
                 else {
@@ -641,7 +652,7 @@ export class Database {
             };
             
             await this.db.diplomacy.put(diplDB);
-            
+            await this.db.capacity.put(cap_aux);
             goods = {...goods_aux} 
             await this.db.goods.bulkPut(Object.values(goods));
         }).catch(err => {
@@ -719,6 +730,7 @@ export class Database {
             if (aux ===undefined) {
                 if (addTot > cap.resources - cap.actres ) {
                     addTot = 0;
+                    this.errorsnd.play();
                 }
                 await this.db.goods.put({name: Name, income: addInc, total: addTot,valPU:valPU});
             }
@@ -727,12 +739,15 @@ export class Database {
                 let sum = aux.total + addTot;
                 if (sum < 0) {
                     aux.total = 0;
+                    this.errorsnd.play();
                 }
                 else if (addTot > cap.resources - cap.actres && !aux.food) {
                     addTot = 0 ;
+                    this.errorsnd.play();
                 }
                 else if (addTot > cap.food - cap.actfood && aux.food) {
                     addTot = 0;
+                    this.errorsnd.play();
                 }
                 else {
                     aux.total += addTot;

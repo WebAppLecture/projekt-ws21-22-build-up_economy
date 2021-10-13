@@ -16,6 +16,11 @@ function getUnhidden(tbls) {
     })
     return res;
 }
+//Mutes a certain element
+function mute(el) {
+    el.muted = true;
+    el.pause();
+};
 
 let btns_top = Array.from(document.querySelectorAll(".controls > button")),
     tbls = Array.from(document.querySelectorAll(".menu > .grid"));
@@ -95,6 +100,13 @@ function manualCall() {
 document.querySelector("#primary").addEventListener("click", () => DataAs.weekPassed());
 document.querySelector("#secondary").addEventListener("click", () => { manualCall(); });
 
+//Mutes all sounds
+document.getElementById("mutebtn").addEventListener("click",(item)=>{
+    document.querySelectorAll("audio").forEach(el => mute(el));
+    console.log(item.target.value)
+    item.target.value = "🔊";
+    console.log(item.target)
+});
 
 //Loads the main file
 let DataAs = new Database();

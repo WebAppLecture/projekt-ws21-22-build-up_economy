@@ -9,6 +9,9 @@
         <audio id="booksound" src="./src/data/Scrolling_book.mp3"></audio>
         <audio id="roostersound" src="./src/data/Hahnenschrei.mp3"></audio>
         <audio id="buildingsound" src="./src/data/Buildingsound.mp3"></audio>
+        <audio id="errorsound" src="./src/data/Error.mp3"></audio>
+        <audio id="cheeringsound" src="./src/data/Cheering.mp3"></audio>
+        <audio id="riotingsound" src="src/data/Rioting.mp3"></audio>
     </head>
     <body>
         <div class="centered gameBox">
@@ -48,7 +51,9 @@
                 <div class="previous"><</div>
                 <div class="next">></div>
             </nav>
-
+            <div id="Mute">
+                <input type="button" class="reset" id="mutebtn" value="🔇"></input>
+            </div>
             <!-- Here is the book -->
             <div class="accent" id="book"></div>
         </div>
