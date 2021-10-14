@@ -19,7 +19,9 @@
             
             <h2 id="GeneralNavigation">General ideas and navigation</h2>
                 <p>Welcome to Assignan's (or maybe another medieval/fantasy village's) economy simulator!</p>
-                <p>At first, take some time and enjoy the hidden easter eggs on the page! Maybe you want to read a book? ;)</p>
+                <p>At first, take some time and enjoy the hidden easter eggs on the page! Maybe you want to read a book? ;) 
+                    But watch out when pressing the buttons, some indicate their output by a sound, which can be turned down 
+                    logarithmically by the button on the right in three stages (100%, 10% or 0% volume).</p>
                 <p>As you can see, Assignan has a complex economy and this website will facilitate
                     the managing of all the resulting exhaustingly numerous difficulties.
                 </p>
@@ -29,7 +31,7 @@
                 </p>
                 <p>
                     Furthermore, we have buttons in the right upper corner to adjust goods and buildings/sources of income,
-                    the already mentioned Save/Load buttons in the left bottom corner and  below the two <,> - buttons for switching 
+                    the already mentioned Save/Load buttons in the left bottom corner and  below the two ⇐,⇒ - buttons for switching 
                     between the statistics in the main screen.
                 </p>
                 <p>
@@ -46,6 +48,8 @@
                         <li>&#8594; - Triggers the window change to the right.</li>
                         <li>STRG+S - Saves the database.</li>
                         <li>STRG+L - Load a .json-file with database.</li>
+                        <li>↓ - Turns down the volume in the order of the button, i.e. the first click completely mutes everything and the second one sets the volume to a small fraction.</li>
+                        <li>↑ - Turns down the volume against the order of the button, i.e. first smaller volume, then full mute.</li>
                     </ul>
                 </p>
             <h2 id="MainScreen">The main screen - Statistics</h2>
@@ -69,8 +73,17 @@
                 shows storage capacities and the value of the assets in Assignan.</p>
             <h3 id="StatsGoods">Statistics of possessed goods</h3>
             <p>Here, all goods are listed alphabetically with their current total number, 
-                their income in the next week, the value per unit in goldpieces and their total value.</p>
-            <p>Until now, there are no penalties implemented in case of negative number of food or too much resources for the storage capacities.</p>
+                their income in the next week, the value per unit in goldpieces and their total value.
+            </p>
+            <p>In this stage of the code, there are penalties implemented in case you have not enough food or try to store more goods than you have storage.</p>
+            <p>The first case causes lower productivity (proportional to the importance of the specific kind of food) and at the threshold of 50% producivity, 
+                the people start to riot and fewer new inhabitants will immigrate. On the other hand, if you provide luxury and other sources of happiness, 
+                the productivity can exceed 100% and thus, the fame will be modified.
+            </p>
+            <p>
+                The second case of exceeding hard caps of the storage or housings during the weekly income can cause trouble by filling the storehouse up to the maximum.
+                Disregarding the source of the overflow, the storage will always be capped to the given capacity of the storehouses etc.
+            </p>
             <h3 id="StatsBuildings">Statistics of buildings and sources of income</h3>
             <p>Using that window, you can manage your buildings, monitor their yields and adjust either the number of buildings by investing resources (Keep an eye on your resources: 
                 If a red button appears when you are hovering about it, there will be nothing built.)
@@ -87,9 +100,9 @@
                 <p>Here, you can add or remove a number of existing items by writing a name, selecting one operation 
                     (Add or Remove) and typing your wanted number. In that case, the Value per Unit is not taken into account, since the item already exists.</p>
                 <p>For a new item, whose name is not known, and therefore not suggested in the droplist, you have to remain with the Add option and also write a Value per Unit.</p>
-                <p>If you add too much items for the space, the input number will be replaced by a 0. A new item will nevertheless be added to the Goods (with a total number 0 of stored items 
-                    in order to prevent typos from messing up the whole database). 
-                    By hovering above an input, you can find some hints.</p>
+                <p>If you add too much items for the space, the input number will be replaced by a 0 and you will hear an error sound. 
+                    A new item will nevertheless be added to the Goods (with a total number 0 of stored items in order to prevent typos from messing up the whole database). 
+                    By hovering above an input, you can find some hints. If you remove more items of a kind than tored, you will remove everything instead of generating "negative" storage.</p>
                 <p style="text-decoration: underline;">Adding new sources of income</p>
                 <p>Moreover, you can use the settings to add NEW and UNBUILDABLE sources of income. If you want to add a new building, which can be built as described in 
                     section <a href="#StatsBuildings">2.3</a>, you have to deal with the json file by itself, 

@@ -28,7 +28,9 @@ export class Database {
             });
             
         //If there is no other possibility, one can recreate the village by uncommenting this command:
+        /*
         this.initDatabase();
+        */
 
         //Initializes the Settings button (which wont run without data!)
         this.initSettings();
@@ -391,7 +393,7 @@ export class Database {
         cap.style = "white-space: pre"; cap.innerHTML = "Storage"+"\t\t&#129717;\tused\t"+cap_aux.actres.toFixed(2)+"\tof\t"+cap_aux.resources+"\n\t\t\t&#127828;\tused\t"+cap_aux.actfood.toFixed(2)+"\tof\t"+cap_aux.food; container.appendChild(cap);
         dipl.style = "white-space: pre"; dipl.innerHTML="☆\t-\t"+dipl_aux.actualfame+"\t"+dipl_aux.fameinfo+"\n🗲\t-\t"+dipl_aux.arcane; container.appendChild(dipl);
         val.style = "white-space: pre"; val.innerHTML = "\&#129689; \tin \ttotal\t" + val_aux.total.toFixed(2) + "\n\tin\t&#127828;&#129717\t" + val_aux.resources.toFixed(2) + "\n\tin\t&#127968;&#127970;\t" + val_aux.buildings.toFixed(2); container.appendChild(val);
-        
+        console.log(dipl_aux)
         let prod = document.getElementById("prodmod");
         prod.innerHTML = "&#9881; "+cap_aux.prodmod+" %"
     };
@@ -637,6 +639,7 @@ export class Database {
             if (cap_aux.prodmod != 100) {
                 if (cap_aux.prodmod <= 50) {
                     diplDB.actualfame = diplDB.fame*cap_aux.prodmod/100;
+                    diplDB.fameinfo = "The village disintegrates!"
                 }
                 else if (cap_aux.prodmod > 100) {
                     diplDB.actualfame = diplDB.fame*(1 + (cap_aux.prodmod-100)*10/100);
