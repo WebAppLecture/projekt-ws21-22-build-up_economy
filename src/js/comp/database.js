@@ -28,9 +28,9 @@ export class Database {
             });
             
         //If there is no other possibility, one can recreate the village by uncommenting this command:
-        /*
+        
         this.initDatabase();
-        */
+        
 
         //Initializes the Settings button (which wont run without data!)
         this.initSettings();
