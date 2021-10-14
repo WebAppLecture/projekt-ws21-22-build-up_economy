@@ -28,9 +28,9 @@ export class Database {
             });
             
         //If there is no other possibility, one can recreate the village by uncommenting this command:
-        
+        /*
         this.initDatabase();
-        
+        */
 
         //Initializes the Settings button (which wont run without data!)
         this.initSettings();
@@ -122,7 +122,7 @@ export class Database {
                 if (ops.selectedOptions[0].text==="Remove") {
                      inpValTot *= -1;
                 }
-                await this.addGood(inputsItems[0].value,0,inpValTot*1,inputsItems[2].value*1)
+                await this.addGood(inputsItems[0].value,0,inpValTot*1,inputsItems[2].value*1,inputsItems[3].value*1,inputsItems[4].value*1);
             }
         });
         await this.createBuildingsAdd();
@@ -281,6 +281,24 @@ export class Database {
         inpVal.title="Only necessary in case of new items, otherwise it can be left blank."
         Add.appendChild(inpVal);
 
+        let inpConsmod = document.createElement("input");
+        inpConsmod.placeholder="Consumption Modifier"
+        inpConsmod.type = "number"
+        inpConsmod.id="inpConsmod"
+        inpConsmod.value="";
+        inpConsmod.pattern="(\d|(\d,\d{0,2}))";
+        inpConsmod.title="Only necessary in case of new items, otherwise it can be left blank.\nHigher values means more importance, e.g.: Bread has 2, Beef and Fish 1"
+        Add.appendChild(inpConsmod);
+
+        let inpLuxmod = document.createElement("input");
+        inpLuxmod.placeholder="Luxury Modifier"
+        inpLuxmod.type = "number"
+        inpLuxmod.id="inpLuxmod"
+        inpLuxmod.value="";
+        inpLuxmod.pattern="(\d|(\d,\d{0,2}))";
+        inpLuxmod.title="Only necessary in case of new items, otherwise it can be left blank.\nHigher value means more productivity bonus, e.g.: 1 = 5%" 
+        Add.appendChild(inpLuxmod);
+
         let btn = document.createElement("button");
         btn.innerHTML="▶"
         Add.appendChild(btn)
@@ -342,7 +360,8 @@ export class Database {
     async weekPassed() {
         
         this.weekPassedComputations();
-        this.update();
+        //Restrict sounds to the production modifier of the incoming week, not the passed one.
+        this.update().then(async ()=>{
         let cap_aux = await this.db.capacity.get("Capacity");
         //Plays sound dependent on happiness in the village
         
@@ -351,6 +370,7 @@ export class Database {
             riotsnd.play();
         }
         else if (cap_aux.prodmod > 100) {
+            console.log(cap_aux.prodmod)
             let cheersnd = document.getElementById("cheeringsound");
             cheersnd.play();
         }
@@ -358,6 +378,7 @@ export class Database {
             let snd = document.getElementById("roostersound");
             snd.play();
         };
+        });
         
     };
 
@@ -751,17 +772,21 @@ export class Database {
     };
 
     //Adds a particular income or total to a certain (possibly new) good
-    async addGood (Name,addInc,addTot,valPU){
+    async addGood (Name,addInc,addTot,valPU,foodmod,luxmod){
         this.db.transaction("rw",this.db.goods,this.db.capacity, async () => {
             let aux = await this.db.goods.get(Name),
                 cap = await this.db.capacity.get("Capacity");
+            let foodbol = false;
 
             if (aux ===undefined) {
                 if (addTot > cap.resources - cap.actres ) {
                     addTot = 0;
                     this.errorsnd.play();
-                }
-                await this.db.goods.put({name: Name, income: addInc, total: addTot,valPU:valPU});
+                };
+                if (foodmod != undefined) {
+                    foodbol = true;
+                };
+                await this.db.goods.put({name: Name, income: addInc, total: addTot,valPU:valPU,unstorable:false,food:foodbol,consmod:foodmod,luxmod:luxmod});
             }
             else{
                 //Takes care of storage capacities
