@@ -2,7 +2,7 @@ export class Database {
     constructor() {
           this.db = new Dexie("assignan_database");
           this.db.version(1).stores({
-              goods: 'name,income,total,valPU,food,unstorable,consmod',
+              goods: 'name,income,total,valPU,food,unstorable,consmod,luxmod',
               buildings: 'name,cost,number,yield_weekly,yield_const,value,buildable,variable',
               time: 'name,year,week',
               population: 'name,total,adult,infant,housings',
@@ -28,9 +28,9 @@ export class Database {
             });
             
         //If there is no other possibility, one can recreate the village by uncommenting this command:
-        /*
+        
         this.initDatabase();
-        */
+        
 
         //Initializes the Settings button (which wont run without data!)
         this.initSettings();
@@ -47,12 +47,14 @@ export class Database {
         this.assets = ["Wood","Stone","Silver","Marble","Glass","Gold","Grapes","Pottery","Furniture","Bread","Wheat","Beef","Fish","Spiritual Food","GP"];
         this.asset_num = [5475,25,12,220,625,5,40,60,0,1250,0,700,300,0,2658];
         this.asset_VPU = [1.5,3,50,10,4,100,2.5,2,6.5,0.1,0.1,0.3,0.2,0,1];
-        this.asset_food = [false,false,false,false,false,false,false,false,false,true,false,true,true,false,false];
+        this.asset_food = [false,false,false,false,false,false,true,false,false,true,false,true,true,false,false];
         this.unstorable = [false,false,false,false,false,false,false,false,false,false,false,false,false,true,false];
-        this.consmod = [0,0,0,0,0,0,0,0,0,2,0,1,1,0,0];
+        this.consmod = [0,0,0,0,0,0,0.1,0,0,2,0,1,1,0,0];
+        this.luxmod = [0,0,0,0,0,0,1,0,0,0,0,0,0,0,0];
         
         for (let i=0;i<this.assets.length;i++) {
-            this.db.goods.put({name:this.assets[i],income:0,total:this.asset_num[i],valPU:this.asset_VPU[i],food:this.asset_food[i],unstorable:this.unstorable[i],consmod:this.consmod[i]});
+            this.db.goods.put({name:this.assets[i],income:0,total:this.asset_num[i],valPU:this.asset_VPU[i],food:this.asset_food[i],
+                unstorable:this.unstorable[i],consmod:this.consmod[i],luxmod:this.luxmod[i]});
         }
         let goods = await this.getAllGoods();
 
@@ -393,7 +395,6 @@ export class Database {
         cap.style = "white-space: pre"; cap.innerHTML = "Storage"+"\t\t&#129717;\tused\t"+cap_aux.actres.toFixed(2)+"\tof\t"+cap_aux.resources+"\n\t\t\t&#127828;\tused\t"+cap_aux.actfood.toFixed(2)+"\tof\t"+cap_aux.food; container.appendChild(cap);
         dipl.style = "white-space: pre"; dipl.innerHTML="☆\t-\t"+dipl_aux.actualfame+"\t"+dipl_aux.fameinfo+"\n🗲\t-\t"+dipl_aux.arcane; container.appendChild(dipl);
         val.style = "white-space: pre"; val.innerHTML = "\&#129689; \tin \ttotal\t" + val_aux.total.toFixed(2) + "\n\tin\t&#127828;&#129717\t" + val_aux.resources.toFixed(2) + "\n\tin\t&#127968;&#127970;\t" + val_aux.buildings.toFixed(2); container.appendChild(val);
-        console.log(dipl_aux)
         let prod = document.getElementById("prodmod");
         prod.innerHTML = "&#9881; "+cap_aux.prodmod+" %"
     };
@@ -610,49 +611,74 @@ export class Database {
             })});
             let food = [], 
                 consmod = [],
-                consmod_tot = 0;
+                consmod_tot = 0,
+                luxmod_tot = 0;
             Object.keys(goods_aux).forEach( key => {
-                if (goods_aux[key].food) {
+                if (goods_aux[key].food && goods_aux[key].total + goods_aux[key].income > 0) {
                     food.push(key);
                     consmod.push(goods_aux[key].consmod);
                     consmod_tot += goods_aux[key].consmod;
+                    luxmod_tot += goods_aux[key].luxmod;
                 };
             });
 
-            //Managing food consumption
+            //Managing food consumption with careful attention to the production modifier => define a variable which stores the consumption temporarily in order to compute correctly the production modifier on the incomes
             cons -= goods_aux["Spiritual Food"].income
+            let income_consum_mod = {},
+                lux_consum_mod = {};
             for (let i in food) {
-                goods_aux[food[i]].income -= cons*consmod[i]/consmod_tot;
+                income_consum_mod[food[i]] = - cons*consmod[i]/consmod_tot;
             };
+            Object.keys(goods_aux).forEach( key => {
+                if(goods_aux[key]!= 0 && goods_aux[key].total + goods_aux[key].income + income_consum_mod[key] < 0 && goods_aux[key].income + income_consum_mod[key]<0) {
+                    lux_consum_mod[key] = Math.abs((goods_aux[key].total + goods_aux[key].income)/income_consum_mod[key]);
+                    income_consum_mod[key] = - goods_aux[key].total;
+                };
+            });
 
-            //Managing debuffs in case of missing food proportional to the importance of the food
+            //Managing debuffs in case of missing food proportional to the importance of the food and also the luxury food
+            //Idea: Even if there are not enough luxury goods to supply all inhabitants (such that it is set to 0 in the lines above), there should still be a boost of economy for one week
+            //          proportional to the fraction of consumption and production.
             let prodmod = 100;
             let diplDB = await this.db.diplomacy.get("Diplomacy");
             for (let i in food) {
-                if (goods_aux[food[i]].total + goods_aux[food[i]].income < 0) {
+                if (goods_aux[food[i]].total + goods_aux[food[i]].income + income_consum_mod[food[i]] < 0 && goods_aux[food[i]].luxmod === 0) {
                     prodmod -= (consmod[i]/consmod_tot).toFixed(2)*100;
+                }
+                else if (goods_aux[food[i]].luxmod != 0) {
+                    if (lux_consum_mod[food[i]] != undefined) {
+                        prodmod += goods_aux[food[i]].luxmod*5*lux_consum_mod[food[i]]
+                    }
+                    else {
+                        prodmod += goods_aux[food[i]].luxmod*5
+                    };
                 };
             };
-            cap_aux.prodmod = prodmod;
+            cap_aux.prodmod = prodmod.toFixed(0);
             
             //Since the food for this week is already consumed, we dont recompute the food income based on the total, but on the left income AFTER the village has eaten
-            if (cap_aux.prodmod != 100) {
-                if (cap_aux.prodmod <= 50) {
-                    diplDB.actualfame = diplDB.fame*cap_aux.prodmod/100;
-                    diplDB.fameinfo = "The village disintegrates!"
-                }
-                else if (cap_aux.prodmod > 100) {
-                    diplDB.actualfame = diplDB.fame*(1 + (cap_aux.prodmod-100)*10/100);
-                    diplDB.fameinfo = "The village is prospering!";
-                }
-                else {
-                    diplDB.fameinfo = "";
-                    diplDB.actualfame = diplDB.fame;
-                };
-                Object.keys(goods_aux).forEach(item => goods_aux[item].income *= cap_aux.prodmod / 100);
-                //Lancellins Food production isnt affected by this
-                goods_aux["Spiritual Food"].income /= cap_aux.prodmod / 100;
+            if (cap_aux.prodmod <= 50) {
+                diplDB.actualfame = diplDB.fame*cap_aux.prodmod/100;
+                diplDB.fameinfo = "The village disintegrates!"
+            }
+            else if (cap_aux.prodmod > 100) {
+                diplDB.actualfame = diplDB.fame*(1 + (cap_aux.prodmod-100)*10/100);
+                diplDB.fameinfo = "The village is prospering!";
+            }
+            else {
+                diplDB.fameinfo = "";
+                diplDB.actualfame = diplDB.fame;
             };
+            Object.keys(goods_aux).forEach(item => {
+                goods_aux[item].income *= cap_aux.prodmod / 100;
+                
+            });
+            //Lancellins Food production isnt affected by this
+            goods_aux["Spiritual Food"].income /= cap_aux.prodmod / 100;
+            
+            Object.keys(income_consum_mod).forEach(item =>{
+                goods_aux[item].income += income_consum_mod[item]
+            });
             
             await this.db.diplomacy.put(diplDB);
             await this.db.capacity.put(cap_aux);
