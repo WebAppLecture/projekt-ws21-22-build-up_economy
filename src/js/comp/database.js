@@ -122,7 +122,7 @@ export class Database {
                 if (ops.selectedOptions[0].text==="Remove") {
                      inpValTot *= -1;
                 }
-                await this.addGood(inputsItems[0].value,0,inpValTot*1,inputsItems[2].value*1,inputsItems[3].value*1,inputsItems[4].value*1);
+                await this.addGood(inputsItems[0].value,0,inpValTot*1,inputsItems[2].value*1)
             }
         });
         await this.createBuildingsAdd();
@@ -280,24 +280,6 @@ export class Database {
         inpVal.pattern="(\d|(\d,\d{0,2}))";
         inpVal.title="Only necessary in case of new items, otherwise it can be left blank."
         Add.appendChild(inpVal);
-
-        let inpConsmod = document.createElement("input");
-        inpConsmod.placeholder="Consumption Modifier"
-        inpConsmod.type = "number"
-        inpConsmod.id="inpConsmod"
-        inpConsmod.value="";
-        inpConsmod.pattern="(\d|(\d,\d{0,2}))";
-        inpConsmod.title="Only necessary in case of new items, otherwise it can be left blank."
-        Add.appendChild(inpConsmod);
-
-        let inpLuxmod = document.createElement("input");
-        inpLuxmod.placeholder="Luxury Modifier"
-        inpLuxmod.type = "number"
-        inpLuxmod.id="inpLuxmod"
-        inpLuxmod.value="";
-        inpLuxmod.pattern="(\d|(\d,\d{0,2}))";
-        inpLuxmod.title="Only necessary in case of new items, otherwise it can be left blank."
-        Add.appendChild(inpLuxmod);
 
         let btn = document.createElement("button");
         btn.innerHTML="▶"
@@ -469,7 +451,6 @@ export class Database {
             storGoods = 0,
             storFood = 0;
         let goods = await this.getAllGoods();
-        console.log(goods);
         const cap_aux = await this.db.capacity.get("Capacity");
         let col = "";
         if (cap_aux.prodmod < 100) {
@@ -770,21 +751,17 @@ export class Database {
     };
 
     //Adds a particular income or total to a certain (possibly new) good
-    async addGood (Name,addInc,addTot,valPU,foodmod,luxmod){
+    async addGood (Name,addInc,addTot,valPU){
         this.db.transaction("rw",this.db.goods,this.db.capacity, async () => {
             let aux = await this.db.goods.get(Name),
                 cap = await this.db.capacity.get("Capacity");
-            let foodbol = false;
 
             if (aux ===undefined) {
                 if (addTot > cap.resources - cap.actres ) {
                     addTot = 0;
                     this.errorsnd.play();
-                };
-                if (foodmod != undefined) {
-                    foodbol = true;
-                };
-                await this.db.goods.put({name: Name, income: addInc, total: addTot,valPU:valPU,unstorable:false,food:foodbol,consmod:foodmod,luxmod:luxmod});
+                }
+                await this.db.goods.put({name: Name, income: addInc, total: addTot,valPU:valPU});
             }
             else{
                 //Takes care of storage capacities
