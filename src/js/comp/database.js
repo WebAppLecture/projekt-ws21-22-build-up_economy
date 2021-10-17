@@ -544,6 +544,7 @@ export class Database {
         let valueBuildings = 0;
         let builds = await this.getAllBuildings();
         let goods = await this.getAllGoods();
+        let pops = await this.db.population.get("Population");
         for (let build of builds ) {
             let cell3 = document.createElement("div"),
                 cell5 = document.createElement("div"),
@@ -559,7 +560,7 @@ export class Database {
             this.createCells(container,[aux.name,txt_cost]);
             
             if (aux.variable) {
-                for (let i = 0;i<=100;i++) {
+                for (let i = 0;i<=pops.adult.toFixed(0);i++) {
                     let opt = document.createElement("option");
                     opt.value = i;
                     opt.innerText = i;
