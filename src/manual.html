@@ -71,11 +71,13 @@
                 </ul>
             <p>Therefore, the left hand side shows the population and "diplomatic" values, whereas the right hand side 
                 shows storage capacities and the value of the assets in Assignan.</p>
+            <p>The number of people are rounded to integers, but in the background these values are handled as floats to imitate the growth of the villagers.
+                If there are not enough houses for your people, the section will turn red to indicate a problem and cause debuffs to your production modifier (proportional to the rate of missing and existing housings).</p>
             <h3 id="StatsGoods">Statistics of possessed goods</h3>
             <p>Here, all goods are listed alphabetically with their current total number, 
                 their income in the next week, the value per unit in goldpieces and their total value.
             </p>
-            <p>In this stage of the code, there are penalties implemented in case you have not enough food or try to store more goods than you have storage.</p>
+            <p>In this stage of the code, there are penalties/caps implemented in case you have not enough food or try to store more goods than you have storage.</p>
             <p>The first case causes lower productivity (proportional to the importance of the specific kind of food) and at the threshold of 50% producivity, 
                 the people start to riot and fewer new inhabitants will immigrate. On the other hand, if you provide luxury and other sources of happiness, 
                 the productivity can exceed 100% and thus, the fame will be modified.
@@ -99,10 +101,13 @@
                 <p style="text-decoration: underline;">Adding items</p>
                 <p>Here, you can add or remove a number of existing items by writing a name, selecting one operation 
                     (Add or Remove) and typing your wanted number. In that case, the Value per Unit is not taken into account, since the item already exists.</p>
-                <p>For a new item, whose name is not known, and therefore not suggested in the droplist, you have to remain with the Add option and also write a Value per Unit.</p>
+                <p>For a new item, whose name is not known, and therefore not suggested in the droplist, you have to remain with the Add option and also write a Value per Unit. There is also the possibility 
+                    to add food and luxury food, which can be done by inserting a consumption and a luxury modifier. Hovering above the inputs shows some hints.</p>
+                <p>Be advised: Adding a new food let the villagers acquire a taste for it and you have to provide also a source of income; otherwise the production modifier will go down. 
+                    You can avoid that by introducing it as a luxury good.</p>
                 <p>If you add too much items for the space, the input number will be replaced by a 0 and you will hear an error sound. 
                     A new item will nevertheless be added to the Goods (with a total number 0 of stored items in order to prevent typos from messing up the whole database). 
-                    By hovering above an input, you can find some hints. If you remove more items of a kind than tored, you will remove everything instead of generating "negative" storage.</p>
+                    By hovering above an input, you can find some hints. If you remove more items of a kind than stored, you will remove everything instead of generating "negative" storage.</p>
                 <p style="text-decoration: underline;">Adding new sources of income</p>
                 <p>Moreover, you can use the settings to add NEW and UNBUILDABLE sources of income. If you want to add a new building, which can be built as described in 
                     section <a href="#StatsBuildings">2.3</a>, you have to deal with the json file by itself, 

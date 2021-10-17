@@ -6,7 +6,7 @@ export class Database {
               buildings: 'name,cost,number,yield_weekly,yield_const,value,buildable,variable',
               time: 'name,year,week',
               population: 'name,total,adult,infant,housings',
-              capacity: 'name,resources,food,prodmod,actres,actfood',
+              capacity: 'name,resources,food,prodmod,actres,actfood,prodmod_misc',
               diplomacy: 'name,fame,arcane,fameinfo,actualfame',
               value: 'name,total,resources,buildings'
           });
@@ -347,19 +347,24 @@ export class Database {
                     };
                 };
             });
-            
+            console.log(goods);
             await this.db.goods.bulkPut(Object.values(goods));
             popsDB.adult += 0.75*diplDB.actualfame;
             popsDB.infant+= 0.25*diplDB.actualfame;
             popsDB.total = popsDB.adult + popsDB.infant;
+
+            if (popsDB.total > popsDB.housings){
+                capDB.prodmod_misc = - ((popsDB.total - popsDB.housings)*100 / popsDB.housings).toFixed(0);
+            };
             await this.db.population.put(popsDB);
+            await this.db.capacity.put(capDB);
         })
     }
 
     //Gathers information from subfunctions and executes them
     async weekPassed() {
-        
-        this.weekPassedComputations();
+        await this.update();
+        await this.weekPassedComputations();
         //Restrict sounds to the production modifier of the incoming week, not the passed one.
         this.update().then(async ()=>{
         let cap_aux = await this.db.capacity.get("Capacity");
@@ -370,7 +375,6 @@ export class Database {
             riotsnd.play();
         }
         else if (cap_aux.prodmod > 100) {
-            console.log(cap_aux.prodmod)
             let cheersnd = document.getElementById("cheeringsound");
             cheersnd.play();
         }
@@ -412,7 +416,12 @@ export class Database {
         val_aux.total = val_aux.buildings + val_aux.resources
         await this.db.value.put(val_aux);
         //Creating strings for cells with correct formatting
-        pop.style = "white-space: pre"; pop.innerHTML="&#127968;\t-\t"+pop_aux.housings+"\t\t\t\t👪\t-\t"+pop_aux.total.toFixed(2)+"\n🧑\t-\t"+pop_aux.adult.toFixed(2)+"  \t\t\t🧒\t-\t"+pop_aux.infant.toFixed(2);container.appendChild(pop); 
+        pop.style = "white-space: pre"; pop.innerHTML="&#127968;\t-\t"+pop_aux.housings+"\t\t\t\t👪\t-\t"+pop_aux.total.toFixed(0)+"\n🧑\t-\t"+pop_aux.adult.toFixed(0)+"  \t\t\t🧒\t-\t"+pop_aux.infant.toFixed(0);
+        if (pop_aux.housings<pop_aux.total) {
+            pop.style = "white-space: pre; color: red"
+        };
+        container.appendChild(pop); 
+        
         cap.style = "white-space: pre"; cap.innerHTML = "Storage"+"\t\t&#129717;\tused\t"+cap_aux.actres.toFixed(2)+"\tof\t"+cap_aux.resources+"\n\t\t\t&#127828;\tused\t"+cap_aux.actfood.toFixed(2)+"\tof\t"+cap_aux.food; container.appendChild(cap);
         dipl.style = "white-space: pre"; dipl.innerHTML="☆\t-\t"+dipl_aux.actualfame+"\t"+dipl_aux.fameinfo+"\n🗲\t-\t"+dipl_aux.arcane; container.appendChild(dipl);
         val.style = "white-space: pre"; val.innerHTML = "\&#129689; \tin \ttotal\t" + val_aux.total.toFixed(2) + "\n\tin\t&#127828;&#129717\t" + val_aux.resources.toFixed(2) + "\n\tin\t&#127968;&#127970;\t" + val_aux.buildings.toFixed(2); container.appendChild(val);
@@ -632,8 +641,7 @@ export class Database {
             })});
             let food = [], 
                 consmod = [],
-                consmod_tot = 0,
-                luxmod_tot = 0;
+                consmod_tot = 0;
             Object.keys(goods_aux).forEach( key => {
                 if (goods_aux[key].food && goods_aux[key].total + goods_aux[key].income > 0) {
                     food.push(key);
@@ -662,6 +670,9 @@ export class Database {
             //          proportional to the fraction of consumption and production.
             let prodmod = 100;
             let diplDB = await this.db.diplomacy.get("Diplomacy");
+            if (cap_aux.prodmod_misc != undefined) {
+                prodmod += cap_aux.prodmod_misc;
+            };
             for (let i in food) {
                 if (goods_aux[food[i]].total + goods_aux[food[i]].income + income_consum_mod[food[i]] < 0 && goods_aux[food[i]].luxmod === 0) {
                     prodmod -= (consmod[i]/consmod_tot).toFixed(2)*100;
