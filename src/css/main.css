@@ -42,6 +42,9 @@ table {
 #load {
     display: none;
 }
+#mute {
+    transform: translate(420px, -90px) ;
+}
 .hr {
     width: 300%;
     border-style: solid;

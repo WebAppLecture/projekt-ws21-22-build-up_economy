@@ -16,6 +16,38 @@ function getUnhidden(tbls) {
     })
     return res;
 }
+let counter = 0;
+//Switch between different stages of volume
+function unmute(counter,targ) {
+    document.querySelectorAll("audio").forEach(el => {
+        if (counter%3 === 1){
+            el.muted = true;
+            targ.value = "🕩";
+            el.pause();
+            el.currentTime = 0;
+        }
+        else if (counter%3 === 2){
+            el.muted = false
+            el.volume = 0.1;
+            targ.value = "🕪"
+        }
+        else {
+            el.muted = false;
+            el.volume = 1;
+            targ.value = "🕨";
+        };
+        
+    });
+    
+};
+//Engages Volume button
+let volbtn = document.getElementById("mutebtn");
+volbtn.addEventListener("click",(item)=>{
+    counter += 1;
+    unmute(counter,item.target);
+});
+
+
 
 let btns_top = Array.from(document.querySelectorAll(".controls > button")),
     tbls = Array.from(document.querySelectorAll(".menu > .grid"));
@@ -81,6 +113,16 @@ function keyPressed(e) {
         switchSettings(document.querySelector("#reset"));
         break;
 
+        case 38: // Up
+        counter -= 1;
+        unmute(counter,volbtn);
+        break;
+
+        case 40: //Down
+        counter += 1;
+        unmute(counter,volbtn);
+        break;
+
         default: return; // Andere Tasten
     }
     e.preventDefault(); // Sperrt Standardaktion (zB Hilfe bei F1)
@@ -94,6 +136,7 @@ function manualCall() {
 //Initializes the moon and sun functionality
 document.querySelector("#primary").addEventListener("click", () => DataAs.weekPassed());
 document.querySelector("#secondary").addEventListener("click", () => { manualCall(); });
+
 
 
 //Loads the main file
