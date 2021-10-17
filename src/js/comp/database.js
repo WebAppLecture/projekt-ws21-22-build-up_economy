@@ -642,7 +642,8 @@ export class Database {
             })});
             let food = [], 
                 consmod = [],
-                consmod_tot = 0;
+                consmod_tot = 0,
+                luxmod_tot = 0;
             Object.keys(goods_aux).forEach( key => {
                 if (goods_aux[key].food && goods_aux[key].total + goods_aux[key].income > 0) {
                     food.push(key);
