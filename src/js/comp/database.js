@@ -603,7 +603,7 @@ export class Database {
                 btn.addEventListener("mouseover", (el) => {
                     el.target.value="";
                     el.target.pattern="(\d|(\d,\d{0,2}))";
-                    let titlestr = "Missing resources:\n";
+                    let titlestr = buildable ? "" : "Missing resources:\n";
                     Object.keys(defic).forEach(key => {
                         titlestr += key+": "+defic[key]+"\n";
                     })
@@ -823,6 +823,10 @@ export class Database {
                 if (sum < 0) {
                     aux.total = 0;
                     this.errorsnd.play();
+                }
+                //Exclude GP as only good, which is stored outside the storage houses
+                else if (Name === "GP") {
+                    aux.total += addTot;
                 }
                 else if (addTot > cap.resources - cap.actres && !aux.food) {
                     addTot = 0 ;
