@@ -592,7 +592,23 @@ export class Database {
                 btn.innerHTML   = "Build"
                 btn.id          = "btn-build-"+aux.name
                 const buildable = Object.keys(aux.cost).every(resName => goods[resName].total >= aux.cost[resName]);
+                let defic = {};
+                Object.keys(aux.cost).forEach(resName => {
+                    const diff = goods[resName].total - aux.cost[resName];
+                    if (diff < 0) {
+                        defic[resName]= diff;
+                    };
+                });
                 btn.className = buildable ? "build buildable" : "build nonbuildable";
+                btn.addEventListener("mouseover", (el) => {
+                    el.target.value="";
+                    el.target.pattern="(\d|(\d,\d{0,2}))";
+                    let titlestr = "Missing resources:\n";
+                    Object.keys(defic).forEach(key => {
+                        titlestr += key+": "+defic[key]+"\n";
+                    })
+                    el.target.title=titlestr
+                });
                 btn.addEventListener("click", ()=>this.buildBuilding(aux.name,1))
                 container.appendChild(btn)
             }
@@ -756,7 +772,6 @@ export class Database {
     //Builds a certain building "number" times and removes the necessary goods from the database
     async buildBuilding (name, number){
         let snd = document.getElementById("buildingsound");
-        snd.play();
         this.db.transaction("rw",this.db.goods,this.db.buildings, async()=>{
             const building = await this.db.buildings.get(name),
                 requiredGoods = Object.keys(building.cost),
@@ -766,6 +781,7 @@ export class Database {
             if(!buildable) {
                 return
             }
+            snd.play();
             requiredGoods.forEach(resourceName => goods[resourceName].total -= building.cost[resourceName])
             await this.db.goods.bulkPut(Object.values(goods))
             building.number += number
