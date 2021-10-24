@@ -732,7 +732,12 @@ export class Database {
             
             await this.db.diplomacy.put(diplDB);
             await this.db.capacity.put(cap_aux);
-            goods = {...goods_aux} 
+            goods = {...goods_aux};
+            //Rounding all values of goods once per update call
+            Object.keys(goods).forEach(item => {
+                goods[item].total = (goods[item].total).toFixed(3)*1;
+                goods[item].income = (goods[item].income).toFixed(3)*1;
+            });
             await this.db.goods.bulkPut(Object.values(goods));
         }).catch(err => {
             console.error(err.stack);
