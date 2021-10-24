@@ -61,7 +61,7 @@ export class Database {
         this.infstr = ["House","Storehouse","Fishing Hut","Farm","Gristmill","Carpentry","Fiddler's Green","Silver Mine - unskilled Workers","Silver Mine - skilled Workers","Fishing Village - Paris","Chapel - Lancellin","Inn","Docks"];
         this.infstr_cost = [{"Wood":150,"Stone":100,"GP":475},{"Wood":450,"Stone":300,"GP":925},{"Wood":50,"Stone":20,"GP":140},
             {"Wood":500,"Stone":200,"GP":1900},{"Wood":100,"Stone":75,"GP":300},{"Wood":150,"Stone":100,"GP":550},
-            {"Wood":125,"Stone":75,"GP":800},{},{},{},{"GP": 600},{"GP": 800},{"GP": 6000}];
+            {"Wood":125,"Stone":75,"GP":800},{},{},{},{"GP": 600},{"GP": 800},{"GP": 3000}];
         this.infstr_num  = [19,1,3,4,2,0,1,15,4,1,1,1,1];
         this.yield_weekly= [{},{},{"Fish": 48},{"Beef": 80, "Wheat": 100},{"Wheat": -200, "Bread": 200, "GP": 2},{"Wood": -4,"Furniture":4},{},{"Silver": 0.064},{"Silver": 0.4},{"Fish": 100},{"Spiritual Food":240},{},{}];
         this.yield_const = [{"Housings":8},{"StorRes": 15000, "StorFood": 30000},{},{"Housings":4},{},{},{},{},{},{},{},{},{}];
@@ -849,7 +849,7 @@ export class Database {
         }).then(this.update())
     };
 
-    //Gives information about all goods - mainly for debugging purposes
+    //Gives information about all goods
     async getAllGoods () {
         let aux = await this.db.goods.toArray(),
             goods = {};
@@ -857,18 +857,18 @@ export class Database {
         return goods;
     };
 
-    //Gives information about a specific good - mainly for debugging purposes
+    //Gives information about a specific good - for debugging purposes
     async getGood (Name) {
         let aux = await this.db.goods.get(Name);
         return aux;
     };
 
-    //Gives information about all buildings - mainly for debugging purposes
+    //Gives information about all buildings
     async getAllBuildings () {
         return await this.db.buildings.toArray();
     };
 
-    //Gives information about a specific building - mainly for debugging purposes
+    //Gives information about a specific building - for debugging purposes
     async getBuilding (Name) {
         let aux = await this.db.buildings.get(Name);
         return aux;

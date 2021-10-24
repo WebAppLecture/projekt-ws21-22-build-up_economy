@@ -2,93 +2,153 @@
     "goods": [
         {
             "name": "Beef",
-            "income": 69,
+            "income": 91.122,
             "total": 700,
-            "valPU": 0.3
+            "valPU": 0.3,
+            "food": true,
+            "unstorable": false,
+            "consmod": 1,
+            "luxmod": 0
         },
         {
             "name": "Bread",
-            "income": -102,
+            "income": -69.756,
             "total": 1250,
-            "valPU": 0.1
+            "valPU": 0.1,
+            "food": true,
+            "unstorable": false,
+            "consmod": 2,
+            "luxmod": 0
         },
         {
             "name": "Fish",
-            "income": -7,
+            "income": 11.322,
             "total": 300,
-            "valPU": 0.2
+            "valPU": 0.2,
+            "food": true,
+            "unstorable": false,
+            "consmod": 1,
+            "luxmod": 0
         },
         {
             "name": "Furniture",
             "income": 0,
             "total": 0,
-            "valPU": 6.5
+            "valPU": 6.5,
+            "food": false,
+            "unstorable": false,
+            "consmod": 0,
+            "luxmod": 0
         },
         {
             "name": "GP",
-            "income": 4,
+            "income": 4.2,
             "total": 2658,
-            "valPU": 1
+            "valPU": 1,
+            "food": false,
+            "unstorable": false,
+            "consmod": 0,
+            "luxmod": 0
         },
         {
             "name": "Glass",
             "income": 0,
             "total": 625,
-            "valPU": 4
+            "valPU": 4,
+            "food": false,
+            "unstorable": false,
+            "consmod": 0,
+            "luxmod": 0
         },
         {
             "name": "Gold",
             "income": 0,
             "total": 5,
-            "valPU": 100
+            "valPU": 100,
+            "food": false,
+            "unstorable": false,
+            "consmod": 0,
+            "luxmod": 0
         },
         {
             "name": "Grapes",
-            "income": 0,
+            "income": -24.488,
             "total": 40,
-            "valPU": 2.5
+            "valPU": 2.5,
+            "food": true,
+            "unstorable": false,
+            "consmod": 0.1,
+            "luxmod": 1
         },
         {
             "name": "Marble",
             "income": 0,
             "total": 220,
-            "valPU": 10
+            "valPU": 10,
+            "food": false,
+            "unstorable": false,
+            "consmod": 0,
+            "luxmod": 0
         },
         {
             "name": "Pottery",
             "income": 0,
             "total": 60,
-            "valPU": 2
+            "valPU": 2,
+            "food": false,
+            "unstorable": false,
+            "consmod": 0,
+            "luxmod": 0
         },
         {
             "name": "Silver",
-            "income": 0,
+            "income": 2.688,
             "total": 12,
-            "valPU": 50
+            "valPU": 50,
+            "food": false,
+            "unstorable": false,
+            "consmod": 0,
+            "luxmod": 0
         },
         {
             "name": "Spiritual Food",
             "income": 240,
             "total": 0,
-            "valPU": 0
+            "valPU": 0,
+            "food": false,
+            "unstorable": true,
+            "consmod": 0,
+            "luxmod": 0
         },
         {
             "name": "Stone",
-            "income": 216,
+            "income": 0,
             "total": 25,
-            "valPU": 3
+            "valPU": 3,
+            "food": false,
+            "unstorable": false,
+            "consmod": 0,
+            "luxmod": 0
         },
         {
             "name": "Wheat",
             "income": 0,
             "total": 0,
-            "valPU": 0.1
+            "valPU": 0.1,
+            "food": false,
+            "unstorable": false,
+            "consmod": 0,
+            "luxmod": 0
         },
         {
             "name": "Wood",
             "income": 0,
             "total": 5475,
-            "valPU": 1.5
+            "valPU": 1.5,
+            "food": false,
+            "unstorable": false,
+            "consmod": 0,
+            "luxmod": 0
         }
     ],
     "buildings": [
@@ -126,12 +186,12 @@
         {
             "name": "Docks",
             "cost": {
-                "GP": 6000
+                "GP": 3000
             },
             "number": 1,
             "yield_weekly": {},
             "yield_const": {},
-            "value": 6000,
+            "value": 3000,
             "buildable": false,
             "variable": false
         },
@@ -243,37 +303,9 @@
             "variable": false
         },
         {
-            "name": "Quarry - skilled",
-            "cost": {},
-            "number": 4,
-            "yield_weekly": {
-                "Stone": "24"
-            },
-            "yield_const": {
-                "0": ""
-            },
-            "value": 0,
-            "buildable": false,
-            "variable": "true"
-        },
-        {
-            "name": "Quarry - unskilled Workers",
-            "cost": {},
-            "number": 15,
-            "yield_weekly": {
-                "Stone": "8"
-            },
-            "yield_const": {
-                "0": ""
-            },
-            "value": 0,
-            "buildable": false,
-            "variable": "true"
-        },
-        {
             "name": "Silver Mine - skilled Workers",
             "cost": {},
-            "number": 0,
+            "number": 4,
             "yield_weekly": {
                 "Silver": 0.4
             },
@@ -285,7 +317,7 @@
         {
             "name": "Silver Mine - unskilled Workers",
             "cost": {},
-            "number": 0,
+            "number": 15,
             "yield_weekly": {
                 "Silver": 0.064
             },
@@ -332,22 +364,27 @@
         {
             "name": "Capacity",
             "resources": 15000,
-            "food": 30000
+            "food": 30000,
+            "prodmod": "105",
+            "actres": 6422,
+            "actfood": 2290
         }
     ],
     "diplomacy": [
         {
             "name": "Diplomacy",
             "fame": 2,
-            "arcane": 1
+            "arcane": 1,
+            "fameinfo": "The village is prospering!",
+            "actualfame": 3
         }
     ],
     "value": [
         {
             "name": "Value",
-            "total": 62648,
+            "total": 59648,
             "resources": 17360.5,
-            "buildings": 45287.5
+            "buildings": 42287.5
         }
     ]
 }
