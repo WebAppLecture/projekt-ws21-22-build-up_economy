@@ -6,7 +6,7 @@ export class Database {
               buildings: 'name,cost,number,yield_weekly,yield_const,value,buildable,variable',
               time: 'name,year,week',
               population: 'name,total,adult,infant,housings',
-              capacity: 'name,resources,food,prodmod,actres,actfood,prodmod_misc',
+              capacity: 'name,resources,food,prodmod,actres,actfood,prodmod_housings,positive_sources,negative_sources',
               diplomacy: 'name,fame,arcane,fameinfo,actualfame',
               value: 'name,total,resources,buildings'
           });
@@ -28,9 +28,9 @@ export class Database {
             });
             
         //If there is no other possibility, one can recreate the village by uncommenting this command:
-        /*
-        this.initDatabase();
-        */
+        
+        //this.initDatabase();
+        
 
         //Initializes the Settings button (which wont run without data!)
         this.initSettings();
@@ -103,6 +103,17 @@ export class Database {
         await this.createStatGoods();
         await this.createStatTot();
         await this.initSettings();
+        //Sets Information of hover over prodmod div
+        let div_prodmod = document.getElementById("prodmod");
+        div_prodmod.addEventListener("mouseover", async (el) => {
+            
+            el.target.value="";
+            el.target.pattern="(\d|(\d,\d{0,2}))";
+            let capDB = await this.db.capacity.get("Capacity");
+            let titlestr = "Buffs:"+capDB.positive_sources+"\n\nDebuffs:"+ (capDB.negative_sources==="" ? "\n---" : capDB.negative_sources);
+            el.target.title=titlestr
+        });
+
     };
 
     //Initializing Settings page
@@ -347,14 +358,13 @@ export class Database {
                     };
                 };
             });
-            console.log(goods);
             await this.db.goods.bulkPut(Object.values(goods));
             popsDB.adult += 0.75*diplDB.actualfame;
             popsDB.infant+= 0.25*diplDB.actualfame;
             popsDB.total = popsDB.adult + popsDB.infant;
 
             if (popsDB.total > popsDB.housings){
-                capDB.prodmod_misc = - ((popsDB.total - popsDB.housings)*100 / popsDB.housings).toFixed(0);
+                capDB.prodmod_housings = - ((popsDB.total - popsDB.housings)*100 / popsDB.housings).toFixed(0);
             };
             await this.db.population.put(popsDB);
             await this.db.capacity.put(capDB);
@@ -688,12 +698,16 @@ export class Database {
             //          proportional to the fraction of consumption and production.
             let prodmod = 100;
             let diplDB = await this.db.diplomacy.get("Diplomacy");
-            if (cap_aux.prodmod_misc != undefined) {
-                prodmod += cap_aux.prodmod_misc;
+            cap_aux.negative_sources = "";
+            cap_aux.positive_sources = "";
+            if (cap_aux.prodmod_housings != undefined) {
+                prodmod += cap_aux.prodmod_housings;
+                cap_aux.negative_sources += "\nMissing Housings"
             };
             for (let i in food) {
                 if (goods_aux[food[i]].total + goods_aux[food[i]].income + income_consum_mod[food[i]] < 0 && goods_aux[food[i]].luxmod === 0) {
                     prodmod -= (consmod[i]/consmod_tot).toFixed(2)*100;
+                    cap_aux.negative_sources += "\nFood - "+food[i]
                 }
                 else if (goods_aux[food[i]].luxmod != 0) {
                     if (lux_consum_mod[food[i]] != undefined) {
@@ -702,6 +716,7 @@ export class Database {
                     else {
                         prodmod += goods_aux[food[i]].luxmod*5
                     };
+                    cap_aux.positive_sources += "\nLuxury good - " + food[i]
                 };
             };
             cap_aux.prodmod = prodmod.toFixed(0);
