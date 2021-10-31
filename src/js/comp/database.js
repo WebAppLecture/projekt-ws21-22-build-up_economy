@@ -366,6 +366,9 @@ export class Database {
 
             if (popsDB.total > popsDB.housings){
                 capDB.prodmod_housings = - ((popsDB.total - popsDB.housings)*100 / popsDB.housings).toFixed(0);
+            }
+            else {
+                capDB.prodmod_housings = undefined;
             };
             await this.db.population.put(popsDB);
             await this.db.capacity.put(capDB);
