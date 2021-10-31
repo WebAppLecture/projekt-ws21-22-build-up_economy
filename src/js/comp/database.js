@@ -526,10 +526,11 @@ export class Database {
     };
 
     //Extract the cell creation in the tables
-    createCells(cont,list, color) {
+    createCells(cont,list, color,align) {
         for (let i =0; i<list.length;i++) {
             let cell = document.createElement("div");
             cell.className = "cell";
+            cell.style = (align!=undefined ? "text-align: center" : "");
             cell.innerHTML = list[i];
             if (color != undefined && i === 2) {
                 cell.style.color = color;
@@ -552,7 +553,7 @@ export class Database {
         let container = document.getElementById("build");
         container.innerHTML="";
         
-        this.createCells(container, ["Building","Cost","Number","Yield","Build"]);
+        this.createCells(container, ["Building","Cost","Number","Yield","Build"],undefined,true);
         this.createLine(container,5);
 
         let valueBuildings = 0;
@@ -579,6 +580,7 @@ export class Database {
                     opt.value = i;
                     opt.innerText = i;
                     if(i === aux.number) {opt.selected = "selected"};
+                    slct.style = "text-align: center";
                     slct.appendChild(opt);
                 };
                 slct.addEventListener("change", async (e)=> {
@@ -589,16 +591,18 @@ export class Database {
                 container.appendChild(slct);
             }
             else {
-                cell3.className = "cell" 
-                cell3.innerHTML = aux.number
-                container.appendChild(cell3)
+                cell3.className = "cell";
+                cell3.style = "text-align: center";
+                cell3.innerHTML = aux.number;
+                container.appendChild(cell3);
             };
 
             cell5.className = "cell"
             let txt_yield = "";
             //Create strings in subfunctions
-            txt_yield += this.iterateYields(aux.yield_weekly,"Weekly: ");
-            txt_yield += this.iterateYields(aux.yield_const,"Const: ");
+            txt_yield += this.iterateYields(aux.yield_weekly,"<strong>Weekly yield:</strong>");
+            txt_yield += this.iterateYields(aux.yield_const,"<strong>Constant yield:</strong>");
+            cell5.style = "white-space: pre; text-align: center";
             cell5.innerHTML = txt_yield
             container.appendChild(cell5)
 
@@ -644,7 +648,7 @@ export class Database {
             for (let x in obj) {
                 txt += x+": "+obj[x] +" ";
             };
-            return str+txt
+            return str+"\n"+txt+"\n"
         }
         else {
             return ""
