@@ -110,7 +110,8 @@ export class Database {
             el.target.value="";
             el.target.pattern="(\d|(\d,\d{0,2}))";
             let capDB = await this.db.capacity.get("Capacity");
-            let titlestr = "Buffs:"+capDB.positive_sources+"\n\nDebuffs:"+ (capDB.negative_sources==="" ? "\n---" : capDB.negative_sources);
+            let titlestr = "Buffs:"+ (capDB.positive_sources==="" ? "\n---" : capDB.positive_sources) +
+                            "\n\nDebuffs:"+ (capDB.negative_sources==="" ? "\n---" : capDB.negative_sources);
             el.target.title=titlestr
         });
 
