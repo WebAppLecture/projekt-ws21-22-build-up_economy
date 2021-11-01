@@ -319,6 +319,7 @@ export class Database {
     
     //Takes care of correct year/month
     async timeManager() {
+        console.log("Called time Manager")
         let time = await this.db.time.get("Time");
         if (time.week === 41) {time.year +=1; time.week = 1} else {time.week += 1}
         await this.db.time.put(time)
@@ -379,6 +380,7 @@ export class Database {
     async weekPassed() {
         await this.update();
         await this.weekPassedComputations();
+        await this.timeManager();
         //Restrict sounds to the production modifier of the incoming week, not the passed one.
         this.update().then(async ()=>{
         let cap_aux = await this.db.capacity.get("Capacity");
