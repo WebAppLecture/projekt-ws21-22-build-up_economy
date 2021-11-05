@@ -133,18 +133,15 @@ export class Database {
             inputsItems = Array.from(add.querySelectorAll("input")),
             btn = add.querySelector("button"),
             ops = document.getElementById("opt");
-        let abort = false;
+        
         await btn.addEventListener("click", async () => {
             let inpValTot = inputsItems[1].value;
-            if(inputsItems[0].value.length === 0 || inputsItems[1].value.length === 0){
-                abort = true;
-            }
-            if (abort === false){
+            if(!(inputsItems[0].value.length === 0 || inputsItems[1].value.length === 0)){
                 if (ops.selectedOptions[0].text==="Remove") {
                      inpValTot *= -1;
-                }
+                };
                 await this.addGood(inputsItems[0].value,0,inpValTot*1,inputsItems[2].value*1,inputsItems[3].value*1,inputsItems[4].value*1);
-            }
+            };
         });
 
         //Manage line with sources of income in settings screen
@@ -644,7 +641,6 @@ export class Database {
             //One week has 8 days on Caeldaria
             let cons = 8*(pops.adult+0.5*pops.infant);
             let goods_aux = {...goods};
-            
             Object.keys(goods_aux).forEach(resource => {goods_aux[resource].income = 0});
             Object.keys(incomes).forEach(building => {Object.keys(incomes[building]).forEach((resource,i) => {
                 goods_aux[resource].income += Object.values(incomes[building])[i]*number[building];
@@ -664,7 +660,7 @@ export class Database {
                     luxmod_tot += goods_aux[key].luxmod;
                 };
             });
-
+            console.log(goods_aux["Fish"])
             //Managing food consumption with careful attention to the production modifier => define a variable which stores the consumption temporarily in order to compute correctly the production modifier on the incomes
             cons -= goods_aux["Spiritual Food"].income
             let income_consum_mod = {},
@@ -673,7 +669,7 @@ export class Database {
                 income_consum_mod[food[i]] = - cons*consmod[i]/consmod_tot;
             };
             Object.keys(goods_aux).forEach( key => {
-                if(goods_aux[key]!= 0 && goods_aux[key].total + goods_aux[key].income + income_consum_mod[key] < 0 && goods_aux[key].income + income_consum_mod[key]<0) {
+                if(goods_aux[key].total != 0 && goods_aux[key].total + goods_aux[key].income + income_consum_mod[key] < 0 && goods_aux[key].income + income_consum_mod[key]<0) {
                     lux_consum_mod[key] = Math.abs((goods_aux[key].total + goods_aux[key].income)/income_consum_mod[key]);
                     income_consum_mod[key] = - goods_aux[key].total;
                 };
@@ -704,6 +700,7 @@ export class Database {
                     cap_aux.positive_sources += "\nLuxury good - " + food[i]
                 };
             };
+            console.log(goods_aux["Fish"])
             cap_aux.prodmod = prodmod.toFixed(0);
             await this.computeFameModifier(cap_aux.prodmod);
             //Since the food for this week is already consumed, we dont recompute the food income based on the total, but on the left income AFTER the village has eaten
@@ -713,13 +710,14 @@ export class Database {
 
             //Lancellins Food production isnt affected by this
             goods_aux["Spiritual Food"].income /= cap_aux.prodmod / 100;
-            
+            console.log("Before",goods_aux["Fish"],income_consum_mod["Fish"])
             Object.keys(income_consum_mod).forEach(item =>{
                 goods_aux[item].income += income_consum_mod[item]
             });
             
-            
+            console.log("After",goods_aux["Fish"],income_consum_mod["Fish"])
             await this.db.capacity.put(cap_aux);
+            console.log(goods_aux["Fish"])
             goods = {...goods_aux};
             //Rounding all values of goods once per update call
             Object.keys(goods).forEach(item => {
@@ -837,13 +835,21 @@ export class Database {
             let foodbol = false;
 
             if (aux ===undefined) {
-                if (addTot > cap.resources - cap.actres ) {
-                    addTot = 0;
-                    this.errorsnd.play();
-                };
                 if (foodmod != undefined) {
                     foodbol = true;
                 };
+                if (foodbol === true) {
+                    if (addTot > cap.food - cap.actfood ) {
+                        addTot = 0;
+                        this.errorsnd.play();
+                    };
+                }
+                else {
+                    if (addTot > cap.resources - cap.actres ) {
+                        addTot = 0;
+                        this.errorsnd.play();
+                    };
+                }
                 await this.db.goods.put({name: Name, income: addInc, total: addTot,valPU:valPU,unstorable:false,food:foodbol,consmod:foodmod,luxmod:luxmod});
             }
             else{
