@@ -2,7 +2,7 @@
     "goods": [
         {
             "name": "Beef",
-            "income": 76.4,
+            "income": 79.6,
             "total": 901.122,
             "valPU": 0.3,
             "food": true,
@@ -12,7 +12,7 @@
         },
         {
             "name": "Bread",
-            "income": -92,
+            "income": -88,
             "total": 1180.244,
             "valPU": 0.1,
             "food": true,
@@ -22,7 +22,7 @@
         },
         {
             "name": "Fish",
-            "income": -1.12,
+            "income": 1.32,
             "total": 311.322,
             "valPU": 0.2,
             "food": true,
@@ -32,7 +32,7 @@
         },
         {
             "name": "Furniture",
-            "income": 8.16,
+            "income": 8.24,
             "total": 8.4,
             "valPU": 6.5,
             "food": false,
@@ -42,7 +42,7 @@
         },
         {
             "name": "GP",
-            "income": 4.08,
+            "income": 4.12,
             "total": 2187.2,
             "valPU": 1,
             "food": false,
@@ -102,7 +102,7 @@
         },
         {
             "name": "Silver",
-            "income": 1.632,
+            "income": 1.648,
             "total": 13.68,
             "valPU": 50,
             "food": false,
@@ -122,7 +122,7 @@
         },
         {
             "name": "Stone",
-            "income": 122.4,
+            "income": 123.6,
             "total": 51,
             "valPU": 3,
             "food": false,
@@ -142,7 +142,7 @@
         },
         {
             "name": "Wood",
-            "income": -8.16,
+            "income": -8.24,
             "total": 5216.6,
             "valPU": 1.5,
             "food": false,
@@ -393,12 +393,11 @@
             "name": "Capacity",
             "resources": 15000,
             "food": 30000,
-            "prodmod": "102",
+            "prodmod": "103",
             "actres": 6199.680000000001,
             "actfood": 2408.2000000000003,
-            "negative_sources": "\nMissing Housings",
-            "positive_sources": "\nLuxury good - Grapes",
-            "prodmod_housings": -1
+            "negative_sources": "",
+            "positive_sources": "\nLuxury good - Grapes"
         }
     ],
     "diplomacy": [
@@ -407,7 +406,7 @@
             "fame": 4,
             "arcane": 2,
             "fameinfo": "The village is prospering!",
-            "actualfame": 2.4
+            "actualfame": 5.2
         }
     ],
     "value": [

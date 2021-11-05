@@ -89,7 +89,6 @@ export class Database {
 
     //Is called when important things happen and an update is necessary
     async update(){
-
         //Decision, whether a database/json was loaded
         this.getAllGoods().then((goods)=>{
             if (Object.keys(goods).length > 0) {
@@ -111,6 +110,7 @@ export class Database {
         await this.createStatGoods();
         await this.createStatTot();
         await this.initSettings();
+        await this.computeProdmodHousings();
 
         //Sets Information of hover over prodmod div
         let div_prodmod = document.getElementById("prodmod");
@@ -333,6 +333,17 @@ export class Database {
             popsDB.infant+= 0.25*diplDB.actualfame;
             popsDB.total = popsDB.adult + popsDB.infant;
 
+            await this.db.population.put(popsDB);
+            await this.computeProdmodHousings();
+        })
+    };
+
+    //Computes prodmod housings
+    async computeProdmodHousings() {
+        return this.db.transaction("rw",this.db.population,this.db.capacity, async ()=>{
+            let popsDB = await this.db.population.get("Population"),
+            capDB = await this.db.capacity.get("Capacity");
+
             //Debuff for production in case of missing housings
             if (popsDB.total > popsDB.housings){
                 capDB.prodmod_housings = - ((popsDB.total - popsDB.housings)*100 / popsDB.housings).toFixed(0);
@@ -342,7 +353,9 @@ export class Database {
             };
             await this.db.population.put(popsDB);
             await this.db.capacity.put(capDB);
-        })
+        }).catch(err => {
+            console.error(err.stack)
+        });
     };
 
     //Gathers information from subfunctions and executes them
@@ -435,9 +448,9 @@ export class Database {
     };
 
     //Loads databases via uploaded file
-    loadDB(file) {
-        const data = JSON.parse(file);
-        this.db.transaction("rw",this.db.goods,this.db.buildings,this.db.time,this.db.population, this.db.capacity, this.db.diplomacy, this.db.value, async() => {
+    async loadDB(file) {
+        return this.db.transaction("rw",this.db.goods,this.db.buildings,this.db.time,this.db.population, this.db.capacity, this.db.diplomacy, this.db.value, async() => {
+            const data = JSON.parse(file);
             await this.db.goods.clear();
             await this.db.buildings.clear();
             await this.db.time.clear();
@@ -448,7 +461,7 @@ export class Database {
             await Promise.all(Object.entries(data).map(([key, val]) => {
                 return this.db[key].bulkPut(val);
             }));
-        }).then(()=> this.update());
+        }).then(async ()=> await this.update());
         
     };
 
@@ -660,7 +673,6 @@ export class Database {
                     luxmod_tot += goods_aux[key].luxmod;
                 };
             });
-            console.log(goods_aux["Fish"])
             //Managing food consumption with careful attention to the production modifier => define a variable which stores the consumption temporarily in order to compute correctly the production modifier on the incomes
             cons -= goods_aux["Spiritual Food"].income
             let income_consum_mod = {},
@@ -700,7 +712,6 @@ export class Database {
                     cap_aux.positive_sources += "\nLuxury good - " + food[i]
                 };
             };
-            console.log(goods_aux["Fish"])
             cap_aux.prodmod = prodmod.toFixed(0);
             await this.computeFameModifier(cap_aux.prodmod);
             //Since the food for this week is already consumed, we dont recompute the food income based on the total, but on the left income AFTER the village has eaten
@@ -710,14 +721,11 @@ export class Database {
 
             //Lancellins Food production isnt affected by this
             goods_aux["Spiritual Food"].income /= cap_aux.prodmod / 100;
-            console.log("Before",goods_aux["Fish"],income_consum_mod["Fish"])
             Object.keys(income_consum_mod).forEach(item =>{
                 goods_aux[item].income += income_consum_mod[item]
             });
             
-            console.log("After",goods_aux["Fish"],income_consum_mod["Fish"])
             await this.db.capacity.put(cap_aux);
-            console.log(goods_aux["Fish"])
             goods = {...goods_aux};
             //Rounding all values of goods once per update call
             Object.keys(goods).forEach(item => {
@@ -813,8 +821,8 @@ export class Database {
             await this.db.goods.bulkPut(Object.values(goods))
             building.number += number
             await this.db.buildings.put(building)
-        }).then( () => { 
-            this.update();
+        }).then( async () => { 
+            await this.update();
         }).catch(err => {
             console.error(err.stack)
         })
