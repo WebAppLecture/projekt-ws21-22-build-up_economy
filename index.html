@@ -1,8 +1,61 @@
 <html>
     <head>
-        <link rel="stylesheet" href="src/css/main.css">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+        <link rel="stylesheet" href="./src/css/main.css"/>
+        <link rel="stylesheet" id="skin"/>
+        <script src="https://unpkg.com/dexie@latest/dist/dexie.js"></script>
+        <script defer type="module" src="src/js/design/index.js"></script>
+        <script defer type="module" src="src/js/comp/transition.js"></script>
+        <audio id="booksound" src="./src/data/Scrolling_book.mp3"></audio>
+        <audio id="roostersound" src="./src/data/Hahnenschrei.mp3"></audio>
+        <audio id="buildingsound" src="./src/data/Buildingsound.mp3"></audio>
+        <audio id="errorsound" src="./src/data/Error.mp3"></audio>
+        <audio id="cheeringsound" src="./src/data/Cheering.mp3"></audio>
+        <audio id="riotingsound" src="src/data/Rioting.mp3"></audio>
     </head>
     <body>
+        <div class="centered gameBox">
+            <div class="logo">Assignan - Economic Aspects</div>
+            <canvas class="screen on" width="400" height="600"></canvas>
+
+            <!-- Here are all the menus -->
+            <nav class="menu" id="default">
+                <div class="controls">
+                    <button id="btn-stat-tot" data-table="stat-tot">Statistics overall</button>
+                    <button id="btn-stat-goods" data-table="stat-goods">Statistics goods</button>
+                    <button id="btn-build" data-table="build">Buildings</button>
+                </div>
+                <div id="loadfirst">
+                    <h1>You have to load a .json first!</h1>
+                    <p>(In case this is the first time you open that page, 
+                        you maybe want to take a look into the manual by clicking the moon below.)
+                    </p>
+                </div>
+                <div class="grid" id="stat-tot"></div>
+                <div class="grid row5 hidden" id="stat-goods"></div>
+                <div class="grid row5 hidden" id="build"></div>
+            </nav>
+            <nav class="menu hidden" id="settings"></nav>
+            
+            <!-- Here are all the buttons -->
+            <div id="saveload">
+                <button id="save" class="reset">Save</button>
+                <input type="file" id="load"  accept="application/json">
+                <input type="button" class="reset" value="Load" onclick="document.getElementById('load').click();" />
+            </div>
+            <div id="prodmod">  &#9881; </div>
+            <div id="reset" class="control reset">Settings</div>
+            <div id="primary" class="control big-button A">Week passed</div>
+            <div id="secondary" class="control big-button B">Manual</div>
+            <nav class="stat-change">
+                <div class="previous">⇐</div>
+                <div class="next">⇒</div>
+            </nav>
+            <div id="Mute">
+                <input type="button" class="reset" id="mutebtn" value="🕨"></input>
+            </div>
+            <!-- Here is the book -->
+            <div class="accent" id="book"></div>
+        </div>
     </body>
-    <script type="module" src="src/js/index.js"></script>
 </html>

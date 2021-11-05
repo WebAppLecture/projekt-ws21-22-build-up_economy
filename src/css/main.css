@@ -1,3 +1,65 @@
-body {
+table {
+    border-collapse: separate;
+    border-spacing: 0em 0px;
+    color: white
+}
+#prodmod {
+    color: white;
+    background: black;
+    border-top: .5vh solid var(--blue);
+    border-left: .5vh solid var(--dark-blue);
+    border-bottom: .5vh solid var(--blue);
+    border-right: .5vh solid var(--bright-blue);
+    width: 10vh;
+    height: 4.2vh;
+    font-size: 2.3vh;
+    transform: translate(220px, -90px)
+}
+.grid {
+    display: grid;
+    grid-template-columns: auto auto auto auto auto; 
+    grid-row-gap: 5px;
+    color: white;
+  }
+.row5 > :where(*:nth-child(10n + 6),
+                *:nth-child(10n + 7),
+                *:nth-child(10n + 8),
+                *:nth-child(10n + 9),
+                *:nth-child(10n + 10)) {
+    background: linear-gradient(to right,var(--blue) 25%,var(--bright-blue) 60%,var(--blue) 85%);
+    color: var(--dark-blue);
+}
+#stat-tot {
+    grid-template-columns: auto auto;
+    margin: 5vh;
+}
+
+#settings {
+    color: white;
+    display: grid;
+    grid-template-columns: auto;
+}
+#load {
+    display: none;
+}
+#mute {
+    transform: translate(420px, -90px) ;
+}
+.hr {
+    width: 300%;
+    border-style: solid;
+    margin-left: auto;
+    margin-right: auto;
+}
+#loadfirst {
     text-align: center;
+    color: white;
+}
+.buildable:hover {
+    background: rgb(20, 192, 20);
+    color: black;
+}
+.nonbuildable:hover {
+    background: rgb(228, 54, 54);
+    color: black;
 }

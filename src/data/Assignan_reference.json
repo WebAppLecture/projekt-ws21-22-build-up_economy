@@ -1,0 +1,420 @@
+{
+    "goods": [
+        {
+            "name": "Beef",
+            "income": 79.6,
+            "total": 901.122,
+            "valPU": 0.3,
+            "food": true,
+            "unstorable": false,
+            "consmod": 1,
+            "luxmod": 0
+        },
+        {
+            "name": "Bread",
+            "income": -88,
+            "total": 1180.244,
+            "valPU": 0.1,
+            "food": true,
+            "unstorable": false,
+            "consmod": 2,
+            "luxmod": 0
+        },
+        {
+            "name": "Fish",
+            "income": 1.32,
+            "total": 311.322,
+            "valPU": 0.2,
+            "food": true,
+            "unstorable": false,
+            "consmod": 1,
+            "luxmod": 0
+        },
+        {
+            "name": "Furniture",
+            "income": 8.24,
+            "total": 8.4,
+            "valPU": 6.5,
+            "food": false,
+            "unstorable": false,
+            "consmod": 0,
+            "luxmod": 0
+        },
+        {
+            "name": "GP",
+            "income": 4.12,
+            "total": 2187.2,
+            "valPU": 1,
+            "food": false,
+            "unstorable": false,
+            "consmod": 0,
+            "luxmod": 0
+        },
+        {
+            "name": "Glass",
+            "income": 0,
+            "total": 625,
+            "valPU": 4,
+            "food": false,
+            "unstorable": false,
+            "consmod": 0,
+            "luxmod": 0
+        },
+        {
+            "name": "Gold",
+            "income": 0,
+            "total": 5,
+            "valPU": 100,
+            "food": false,
+            "unstorable": false,
+            "consmod": 0,
+            "luxmod": 0
+        },
+        {
+            "name": "Grapes",
+            "income": -15.512,
+            "total": 15.512,
+            "valPU": 2.5,
+            "food": true,
+            "unstorable": false,
+            "consmod": 0.1,
+            "luxmod": 1
+        },
+        {
+            "name": "Marble",
+            "income": 0,
+            "total": 220,
+            "valPU": 10,
+            "food": false,
+            "unstorable": false,
+            "consmod": 0,
+            "luxmod": 0
+        },
+        {
+            "name": "Pottery",
+            "income": 0,
+            "total": 60,
+            "valPU": 2,
+            "food": false,
+            "unstorable": false,
+            "consmod": 0,
+            "luxmod": 0
+        },
+        {
+            "name": "Silver",
+            "income": 1.648,
+            "total": 13.68,
+            "valPU": 50,
+            "food": false,
+            "unstorable": false,
+            "consmod": 0,
+            "luxmod": 0
+        },
+        {
+            "name": "Spiritual Food",
+            "income": 240,
+            "total": 0,
+            "valPU": 0,
+            "food": false,
+            "unstorable": true,
+            "consmod": 0,
+            "luxmod": 0
+        },
+        {
+            "name": "Stone",
+            "income": 123.6,
+            "total": 51,
+            "valPU": 3,
+            "food": false,
+            "unstorable": false,
+            "consmod": 0,
+            "luxmod": 0
+        },
+        {
+            "name": "Wheat",
+            "income": 0,
+            "total": 0,
+            "valPU": 0.1,
+            "food": false,
+            "unstorable": false,
+            "consmod": 0,
+            "luxmod": 0
+        },
+        {
+            "name": "Wood",
+            "income": -8.24,
+            "total": 5216.6,
+            "valPU": 1.5,
+            "food": false,
+            "unstorable": false,
+            "consmod": 0,
+            "luxmod": 0
+        }
+    ],
+    "buildings": [
+        {
+            "name": "Carpentry",
+            "cost": {
+                "Wood": 150,
+                "Stone": 100,
+                "GP": 550
+            },
+            "number": 2,
+            "yield_weekly": {
+                "Wood": -4,
+                "Furniture": 4
+            },
+            "yield_const": {},
+            "value": 1075,
+            "buildable": true,
+            "variable": false
+        },
+        {
+            "name": "Chapel - Lancellin",
+            "cost": {
+                "GP": 600
+            },
+            "number": 1,
+            "yield_weekly": {
+                "Spiritual Food": 240
+            },
+            "yield_const": {},
+            "value": 600,
+            "buildable": false,
+            "variable": false
+        },
+        {
+            "name": "Docks",
+            "cost": {
+                "GP": 3000
+            },
+            "number": 1,
+            "yield_weekly": {},
+            "yield_const": {},
+            "value": 3000,
+            "buildable": false,
+            "variable": false
+        },
+        {
+            "name": "Farm",
+            "cost": {
+                "Wood": 500,
+                "Stone": 200,
+                "GP": 1900
+            },
+            "number": 4,
+            "yield_weekly": {
+                "Beef": 80,
+                "Wheat": 100
+            },
+            "yield_const": {
+                "Housings": 4
+            },
+            "value": 3250,
+            "buildable": true,
+            "variable": false
+        },
+        {
+            "name": "Fiddler's Green",
+            "cost": {
+                "Wood": 125,
+                "Stone": 75,
+                "GP": 800
+            },
+            "number": 1,
+            "yield_weekly": {},
+            "yield_const": {},
+            "value": 1212.5,
+            "buildable": true,
+            "variable": false
+        },
+        {
+            "name": "Fishing Hut",
+            "cost": {
+                "Wood": 50,
+                "Stone": 20,
+                "GP": 140
+            },
+            "number": 3,
+            "yield_weekly": {
+                "Fish": 48
+            },
+            "yield_const": {},
+            "value": 275,
+            "buildable": true,
+            "variable": false
+        },
+        {
+            "name": "Fishing Village - Paris",
+            "cost": {},
+            "number": 1,
+            "yield_weekly": {
+                "Fish": 100
+            },
+            "yield_const": {},
+            "value": 0,
+            "buildable": false,
+            "variable": false
+        },
+        {
+            "name": "Gristmill",
+            "cost": {
+                "Wood": 100,
+                "Stone": 75,
+                "GP": 300
+            },
+            "number": 2,
+            "yield_weekly": {
+                "Wheat": -200,
+                "Bread": 200,
+                "GP": 2
+            },
+            "yield_const": {},
+            "value": 675,
+            "buildable": true,
+            "variable": false
+        },
+        {
+            "name": "House",
+            "cost": {
+                "Wood": 150,
+                "Stone": 100,
+                "GP": 475
+            },
+            "number": 20,
+            "yield_weekly": {},
+            "yield_const": {
+                "Housings": 8
+            },
+            "value": 1000,
+            "buildable": true,
+            "variable": false
+        },
+        {
+            "name": "Inn",
+            "cost": {
+                "GP": 800
+            },
+            "number": 1,
+            "yield_weekly": {},
+            "yield_const": {},
+            "value": 800,
+            "buildable": false,
+            "variable": false
+        },
+        {
+            "name": "Quarry - unskilled",
+            "cost": {},
+            "number": 15,
+            "yield_weekly": {
+                "Stone": "8"
+            },
+            "yield_const": {
+                "0": ""
+            },
+            "value": 0,
+            "buildable": false,
+            "variable": "true"
+        },
+        {
+            "name": "Quarry skilled",
+            "cost": {},
+            "number": 0,
+            "yield_weekly": {
+                "Stone": "24"
+            },
+            "yield_const": {
+                "0": ""
+            },
+            "value": 0,
+            "buildable": false,
+            "variable": "true"
+        },
+        {
+            "name": "Silver Mine - skilled Workers",
+            "cost": {},
+            "number": 4,
+            "yield_weekly": {
+                "Silver": 0.4
+            },
+            "yield_const": {},
+            "value": 0,
+            "buildable": false,
+            "variable": true
+        },
+        {
+            "name": "Silver Mine - unskilled Workers",
+            "cost": {},
+            "number": 0,
+            "yield_weekly": {
+                "Silver": 0.064
+            },
+            "yield_const": {},
+            "value": 0,
+            "buildable": false,
+            "variable": true
+        },
+        {
+            "name": "Storehouse",
+            "cost": {
+                "Wood": 450,
+                "Stone": 300,
+                "GP": 925
+            },
+            "number": 1,
+            "yield_weekly": {},
+            "yield_const": {
+                "StorRes": 15000,
+                "StorFood": 30000
+            },
+            "value": 2500,
+            "buildable": true,
+            "variable": false
+        }
+    ],
+    "time": [
+        {
+            "name": "Time",
+            "year": 1132,
+            "week": 31
+        }
+    ],
+    "population": [
+        {
+            "name": "Population",
+            "total": 170,
+            "adult": 146.25,
+            "infant": 23.75,
+            "housings": 176
+        }
+    ],
+    "capacity": [
+        {
+            "name": "Capacity",
+            "resources": 15000,
+            "food": 30000,
+            "prodmod": "103",
+            "actres": 6199.680000000001,
+            "actfood": 2408.2000000000003,
+            "negative_sources": "",
+            "positive_sources": "\nLuxury good - Grapes"
+        }
+    ],
+    "diplomacy": [
+        {
+            "name": "Diplomacy",
+            "fame": 4,
+            "arcane": 2,
+            "fameinfo": "The village is prospering!",
+            "actualfame": 5.2
+        }
+    ],
+    "value": [
+        {
+            "name": "Value",
+            "total": 62150.6054,
+            "resources": 16713.1054,
+            "buildings": 45437.5
+        }
+    ]
+}
