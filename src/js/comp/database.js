@@ -32,14 +32,16 @@ export class Database {
         //this.initDatabase();
         
 
-        //Initializes the Settings button (which wont run without data!)
-        this.initSettings();
+        
         //If there is data available, the "json needed" message is cleared
         this.getAllGoods().then((goods)=>{
             if (Object.keys(goods).length > 0) {
                 this.update();
             }
         })
+
+        //Initializes the Settings button (which wont run without data!)
+        this.initSettings();
     };
 
     //Initializes the Database with certain values - shouldnt be used anymore, since data is loaded via external json
@@ -176,9 +178,7 @@ export class Database {
         let datalist = document.createElement("datalist");
         let goods = await this.getAllGoods();
         Object.keys(goods).forEach( name => {
-            let opt = document.createElement("option");
-            opt.value = name;
-            datalist.appendChild(opt);
+            this.createOption(datalist,name,"");
         })
         datalist.id = "goodlist"
         inpName.setAttribute('list', "goodlist");
@@ -190,15 +190,9 @@ export class Database {
         Add.appendChild(inpName);
 
         //Add or Remove possibility
-        let op = document.createElement("select"),
-            option1 = document.createElement("option"),
-            option2 = document.createElement("option");
-        option1.innerText = "Add";
-        option1.value = 0;
-        op.appendChild(option1);
-        option2.innerText = "Remove";
-        option2.value = 1;
-        op.appendChild(option2);
+        let op = document.createElement("select");
+        this.createOption(op,0,"Add");
+        this.createOption(op,1,"Remove");
         op.id ="opt";
         Add.appendChild(op)
 
@@ -230,6 +224,14 @@ export class Database {
         container.appendChild(inp);
     };
 
+    //Outsourced function for options
+    createOption(container,value,text) {
+        let option          = document.createElement("option");
+            option.value        = value;
+            option.innerText    = text;
+            container.appendChild(option);
+    };
+
     //Create new buildings, which are not buildable, but possibly with variable worker number
     async createBuildingsAdd () {
         let container = document.getElementById("settings");
@@ -247,63 +249,32 @@ export class Database {
 
 
         let optTotalYield = document.createElement("select"),
-            optionempty = document.createElement("option"),
-            optionHous = document.createElement("option"),
-            optionStorRes = document.createElement("option"),
-            optionStorFood = document.createElement("option");
-        optionempty.value = 0;
-        optionempty.innerText = "---"
-        optionempty.selected ="selected";
-        optionHous.innerText = "Housings";
-        optionStorRes.innerText = "Storage Resources";
-        optionStorRes.value ="StorRes";
-        optionStorFood.innerText = "Storage Food";
-        optionStorFood.value = "StorFood";
-        optTotalYield.appendChild(optionempty);
-        optTotalYield.appendChild(optionHous);
-        optTotalYield.appendChild(optionStorRes);
-        optTotalYield.appendChild(optionStorFood);
+            incomes = {};
+        builds.forEach(building => {incomes[building.name] = building.yield_const});
+        let values = this.getConstantYieldNames(incomes),
+            texts = ["---","Housings","Storage Resources","Storage Food"];
+        values.unshift(0);
+        for (let k in values) {
+            this.createOption(optTotalYield,values[k],texts[k]);
+        };
         Add.appendChild(optTotalYield)
 
-        let inpTotalYieldNumber = document.createElement("input");
-        inpTotalYieldNumber.placeholder="Constant Yield - Number"
-        inpTotalYieldNumber.type = "number"
-        inpTotalYieldNumber.id="inpTotalYieldNumber"
-        Add.appendChild(inpTotalYieldNumber);
+        this.createInput(Add,"Constant Yield - Number","inpTotalYieldNumber","",false)
 
-
-        let optWeeklyYield = document.createElement("select"),
-        optionemptyWeekly = document.createElement("option");
-        optionemptyWeekly.value = 0;
-        optionemptyWeekly.innerText = "---";
-        optionemptyWeekly.selected ="selected";
+        let optWeeklyYield = document.createElement("select");
+        this.createOption(optWeeklyYield,0,"---");
         let goods = await this.getAllGoods();
         Object.keys(goods).forEach(name => {
-            let optGood = document.createElement("option");
-            optGood.innerText = name;
-            optGood.value = name;
-            optWeeklyYield.appendChild(optGood);
+            this.createOption(optWeeklyYield,name,name);
         });
-        optWeeklyYield.appendChild(optionemptyWeekly);
         Add.appendChild(optWeeklyYield)
 
+        this.createInput(Add,"Weekly Income - Number","inpWeeklyYieldNumber","",false)
 
-        let inpWeeklyYieldNumber = document.createElement("input");
-        inpWeeklyYieldNumber.placeholder="Weekly Income - Number"
-        inpWeeklyYieldNumber.type = "number"
-        inpWeeklyYieldNumber.id="inpWeeklyYieldNumber"
-        Add.appendChild(inpWeeklyYieldNumber);
-
-        let op = document.createElement("select"),
-            option1 = document.createElement("option"),
-            option2 = document.createElement("option");
-        option1.innerText = "Number fixed to 1"
-        option1.value = false
-        option2.innerText = "Number variable";
-        option2.value = true
-        option2.selected = "selected";
-        op.appendChild(option1);
-        op.appendChild(option2);
+        let op = document.createElement("select");
+        this.createOption(op,true,"Number variable");
+        this.createOption(op,false,"Number fixed to 1");
+        
         op.id ="optionsVary";
         Add.appendChild(op)
 
@@ -316,7 +287,6 @@ export class Database {
 
     //Takes care of correct year/month
     async timeManager() {
-        console.log("Called time Manager")
         let time = await this.db.time.get("Time");
         if (time.week === 41) {time.year +=1; time.week = 1} else {time.week += 1}
         await this.db.time.put(time)
@@ -664,7 +634,7 @@ export class Database {
 
     //Computes the yield per week writes them into the goods database including computation of food consumption and (de-)buffs on production modifier
     computeWeeklyYield() {
-        return this.db.transaction("rw",this.db.population,this.db.goods,this.db.buildings,this.db.capacity, async()=>{
+        return this.db.transaction("rw",this.db.population,this.db.goods,this.db.buildings,this.db.capacity,this.db.diplomacy, async()=>{
             let incomes = {},
                 number = {};
             (await this.getAllBuildings()).forEach(building => {incomes[building.name] = building.yield_weekly, number[building.name]=building.number});
@@ -740,7 +710,7 @@ export class Database {
             Object.keys(goods_aux).forEach(item => {
                 goods_aux[item].income *= cap_aux.prodmod / 100;  
             });
-            
+
             //Lancellins Food production isnt affected by this
             goods_aux["Spiritual Food"].income /= cap_aux.prodmod / 100;
             
@@ -789,12 +759,13 @@ export class Database {
         return this.db.transaction("rw",this.db.capacity,this.db.population,this.db.buildings, async()=>{
             let incomes = {},
                 number = {},
-                auxYield = {"food":0,"resources":0,"housings":0},
+                auxYield = {"housings":0,"resources":0,"food":0},
                 aux_stor = await this.db.capacity.get("Capacity"),
                 aux_pop = await this.db.population.get("Population");
+
             (await this.getAllBuildings()).forEach(building => {incomes[building.name] = building.yield_const, number[building.name]=building.number});
+            let names = this.getConstantYieldNames(incomes);
             Object.keys(incomes).forEach( building =>{
-                let names = ["StorFood","StorRes","Housings"];
                 let m = 0;
                 for (let key of Object.keys(auxYield)) {
                     if (incomes[building][names[m]] != undefined) {
@@ -806,14 +777,27 @@ export class Database {
             
             aux_stor.food = auxYield.food;
             aux_stor.resources = auxYield.resources;
-            await this.db.capacity.put(aux_stor);
             aux_pop.housings = auxYield.housings;
+            await this.db.capacity.put(aux_stor);
             await this.db.population.put(aux_pop);
         }).catch(err => {
             console.error(err.stack);
         });
     };
- 
+
+    //Get constant yields from existing buildings
+    getConstantYieldNames(incomes){
+        let names = [];
+        Object.values(incomes).forEach( item =>{
+            if (Object.keys(item) != 0) {
+                Object.keys(item).forEach(yie => {
+                    names.push(yie)
+                });
+            };
+        });
+        return names = [...new Set(names)];
+    };
+
     //Builds a certain building "number" times and removes the necessary goods from the database
     async buildBuilding (name, number){
         let snd = document.getElementById("buildingsound");
@@ -912,5 +896,5 @@ export class Database {
     async getBuilding (Name) {
         let aux = await this.db.buildings.get(Name);
         return aux;
-        }
+    };
 }
